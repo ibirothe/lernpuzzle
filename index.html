@@ -1,0 +1,340 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#e8f7ed">
+  <meta name="description" content="Ein fröhliches Plus-Rechenpuzzle bis 12. Löse Aufgaben und entdecke einen Pferdehof!">
+  <title>Das Pferdehof-Puzzle</title>
+  <style>
+    :root { font-family: "Trebuchet MS", "Arial Rounded MT Bold", system-ui, sans-serif; color: #264b3f; background: #f1faf0; font-synthesis: none; }
+    * { box-sizing: border-box; }
+    body { margin: 0; min-width: 280px; min-height: 100vh; background: radial-gradient(circle at 90% 0%, #fff3d1 0, transparent 38%), radial-gradient(circle at 0% 80%, #d8f2e9 0, transparent 35%), #f1faf0; }
+    button { font: inherit; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+    button:focus-visible { outline: 4px solid #264b3f; outline-offset: 3px; }
+    .app { width: min(960px, calc(100% - 28px)); margin: 0 auto; padding: 30px 0 44px; }
+    .heading { text-align: center; }
+    .eyebrow { color: #678f77; font-size: .78rem; font-weight: 900; letter-spacing: .16em; text-transform: uppercase; }
+    h1 { font-size: clamp(2.05rem, 5.3vw, 3.65rem); line-height: 1.12; letter-spacing: -.035em; margin: 9px 0 10px; color: #1b604c; }
+    .intro { margin: 0 auto 23px; max-width: 580px; color: #547268; line-height: 1.5; font-size: clamp(.96rem, 2vw, 1.1rem); }
+    .toolbar { display: flex; gap: 16px; align-items: center; justify-content: space-between; margin: 0 auto 17px; max-width: 850px; }
+    .progress-panel { flex: 1; min-width: 0; padding: 12px 17px; border-radius: 20px; background: #fff; box-shadow: 0 7px 22px #37674914; }
+    .progress-text { display: flex; justify-content: space-between; align-items: center; gap: 10px; font-size: .91rem; margin-bottom: 9px; }
+    #progressLabel { font-weight: 900; color: #1d6950; white-space: nowrap; }
+    .progress-track { height: 11px; border-radius: 99px; background: #e7eee4; overflow: hidden; }
+    .progress-fill { width: 0%; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #71cc8b, #ffc36e); transition: width .5s ease; }
+    .restart { border: 0; border-radius: 17px; padding: 15px 18px; background: #fff; color: #356a54; font-weight: 900; box-shadow: 0 7px 22px #37674914; }
+    .restart:hover { background: #fff9e8; }
+    .board-frame { max-width: 850px; margin: auto; background: #fff; padding: 10px; border-radius: 26px; box-shadow: 0 15px 48px #346d4b24, 0 3px 10px #2e6b3d0d; }
+    .board { position: relative; width: 100%; aspect-ratio: 5 / 4; overflow: hidden; border-radius: 18px; background: #b9e4de; isolation: isolate; }
+    .farm-art { display: block; width: 100%; height: 100%; position: absolute; inset: 0; }
+    .pieces { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); grid-template-rows: repeat(4, minmax(0, 1fr)); gap: 3px; padding: 3px; position: absolute; inset: 0; }
+    .tile { display: block; border: 0; padding: 0; background: transparent; min-width: 0; min-height: 0; perspective: 900px; border-radius: 9px; }
+    .tile__inner { display: block; position: relative; width: 100%; height: 100%; transform-style: preserve-3d; transition: transform .74s cubic-bezier(.24,.71,.32,1.14); }
+    .tile.solved .tile__inner { transform: rotateY(180deg); }
+    .tile__front, .tile__back { position: absolute; inset: 0; border-radius: 9px; backface-visibility: hidden; -webkit-backface-visibility: hidden; overflow: hidden; }
+    .tile__front { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .2em; background: #fbe9b8; color: #69523a; box-shadow: inset 0 0 0 2px #fff9df99; transition: filter .15s; }
+    .tile:nth-child(4n + 2) .tile__front { background: #d8efdb; color: #32614c; box-shadow: inset 0 0 0 2px #f7fff1aa; }
+    .tile:nth-child(4n + 3) .tile__front { background: #f9dcd8; color: #815654; box-shadow: inset 0 0 0 2px #fff7f3aa; }
+    .tile:nth-child(4n + 4) .tile__front { background: #e8dff7; color: #62567c; box-shadow: inset 0 0 0 2px #faf7ffaa; }
+    .tile:not(.solved):hover .tile__front { filter: brightness(.975); }
+    .tile:not(.solved):active .tile__front { filter: brightness(.94); }
+    .tile__mark { font-size: clamp(.8rem, 1.8vw, 1.3rem); opacity: .55; line-height: 1; }
+    .tile__math { display: flex; flex-direction: column; align-items: center; font-size: clamp(.91rem, 2.45vw, 1.65rem); line-height: 1.25; font-weight: 900; white-space: nowrap; letter-spacing: -.04em; }
+    .tile__back { transform: rotateY(180deg); background: #ffffff08; box-shadow: inset 0 0 0 1px #ffffff44; }
+    .tile.solved { cursor: default; }
+    .board.win .tile__back { box-shadow: none; }
+    .below { min-height: 28px; text-align: center; color: #547268; margin: 18px 10px 0; font-weight: 700; }
+    .finish { max-width: 850px; margin: 20px auto 0; background: #fff4cf; border: 3px dashed #e4bd63; border-radius: 23px; padding: 19px 23px; text-align: center; animation: pop .55s both; }
+    .finish[hidden] { display: none; }
+    .finish h2 { color: #8a5c25; font-size: clamp(1.6rem, 4vw, 2.2rem); margin: 0 0 6px; }
+    .finish p { margin: 0 0 15px; color: #785f35; }
+    .play-again { border: 0; background: #368966; color: #fff; border-radius: 14px; padding: 12px 22px; font-weight: 900; }
+    .play-again:hover { background: #276f51; }
+    .question-dialog { border: 0; border-radius: 29px; padding: 0; width: min(425px, calc(100vw - 28px)); max-height: calc(100dvh - 30px); box-shadow: 0 25px 85px #1e423e75; color: #285342; background: #fffef9; }
+    .question-dialog::backdrop { background: #1f413d91; backdrop-filter: blur(4px); }
+    .question-card { position: relative; padding: 26px clamp(18px, 5vw, 34px) 27px; text-align: center; }
+    .close-dialog { position: absolute; right: 13px; top: 12px; border: 0; background: #e8f3e9; width: 37px; height: 37px; border-radius: 50%; font-size: 1.4rem; color: #39624c; }
+    .question-kicker { color: #a07d51; margin: 8px 0 5px; font-weight: 900; font-size: .82rem; text-transform: uppercase; letter-spacing: .1em; }
+    .question-card h2 { margin: 0 0 10px; font-size: clamp(1.45rem, 5vw, 1.95rem); }
+    .big-math { font-size: clamp(2.6rem, 8vw, 3.7rem); font-weight: 900; letter-spacing: -.065em; line-height: 1.25; color: #2e8965; margin: 12px 0; background: #eaf8e9; border-radius: 19px; padding: 10px 0; }
+    .feedback { margin: 9px auto 14px; min-height: 1.6em; font-weight: 800; color: #5d7469; }
+    .feedback.retry { color: #ac5c37; }
+    .answers { display: grid; grid-template-columns: repeat(4, 1fr); gap: 9px; }
+    .number { border: 0; border-radius: 14px; padding: 11px 0; min-height: 48px; font-size: 1.5rem; font-weight: 900; color: #265c46; background: #e1f1e8; box-shadow: 0 3px 0 #bbd7c6; }
+    .number:hover, .number:focus-visible { background: #bdf0d2; }
+    .number:active { transform: translateY(2px); box-shadow: 0 1px 0 #bbd7c6; }
+    .number:last-child { grid-column: 2 / 4; }
+    .question-hint { margin: 15px 0 0; font-size: .84rem; color: #738779; }
+    .question-card.shake .big-math { animation: shake .32s; }
+    @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)} }
+    @keyframes pop { from{opacity:0;transform:scale(.93)} to{opacity:1;transform:scale(1)} }
+    @media (max-width: 560px) {
+      .app { padding-top: 22px; width: calc(100% - 16px); }
+      .eyebrow { font-size: .69rem; }
+      .intro { margin-bottom: 17px; padding: 0 12px; }
+      .toolbar { gap: 8px; margin-left: 3px; margin-right: 3px; }
+      .progress-panel { padding: 10px 11px; border-radius: 14px; }
+      .progress-text { font-size: .76rem; }
+      .restart { padding: 15px 9px; font-size: .76rem; border-radius: 14px; }
+      .board-frame { padding: 5px; border-radius: 16px; }
+      .board { border-radius: 12px; }
+      .pieces { gap: 2px; padding: 2px; }
+      .tile, .tile__front, .tile__back { border-radius: 5px; }
+      .tile__mark { display: none; }
+      .tile__math { font-size: clamp(.68rem, 3.3vw, .92rem); letter-spacing: -.06em; line-height: 1.2; }
+      .number { min-height: 44px; padding: 7px 0; }
+      .question-card { padding-top: 22px; }
+    }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; } }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header class="heading">
+      <div class="eyebrow">✦ Rechnen · Puzzeln · Staunen ✦</div>
+      <h1>Das Pferdehof-Puzzle 🐴</h1>
+      <p class="intro">Löse die Plusaufgaben und entdecke Stück für Stück einen wunderschönen Pferdehof!</p>
+    </header>
+    <div class="toolbar">
+      <div class="progress-panel">
+        <div class="progress-text"><span>Deine Puzzleteile</span><strong id="progressLabel">0 von 20 geschafft</strong></div>
+        <div id="progressTrack" class="progress-track" role="progressbar" aria-label="Gelöste Puzzleteile" aria-valuemin="0" aria-valuemax="20" aria-valuenow="0">
+          <div id="progressFill" class="progress-fill"></div>
+        </div>
+      </div>
+      <button type="button" id="restart" class="restart" aria-label="Neues Puzzle starten">↻ Neu spielen</button>
+    </div>
+    <div class="board-frame">
+      <section id="board" class="board" aria-label="Pferdehof-Puzzle mit 20 Rechenaufgaben">
+        <svg class="farm-art" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 800" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Ein sonniger Pferdehof mit Stall, zwei Pferden, Koppel und Blumen">
+          <defs>
+            <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#8bd4ef"/><stop offset="1" stop-color="#e5f8ed"/></linearGradient>
+            <linearGradient id="grass" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#9dd17e"/><stop offset="1" stop-color="#5dba73"/></linearGradient>
+            <linearGradient id="roof" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#c96f57"/><stop offset="1" stop-color="#983f39"/></linearGradient>
+          </defs>
+          <rect width="1000" height="800" fill="url(#sky)"/>
+          <circle cx="850" cy="126" r="74" fill="#fff1a0"/><circle cx="850" cy="126" r="58" fill="#ffe38b"/>
+          <g fill="#fff" opacity=".95"><ellipse cx="170" cy="120" rx="80" ry="31"/><circle cx="135" cy="105" r="39"/><circle cx="196" cy="100" r="48"/><ellipse cx="475" cy="173" rx="85" ry="28"/><circle cx="434" cy="160" r="37"/><circle cx="499" cy="154" r="42"/></g>
+          <path d="M0 346 Q170 250 320 318 Q540 225 715 326 Q850 251 1000 300 V800 H0Z" fill="#b1d9a1"/>
+          <path d="M0 408 Q170 344 390 393 Q590 320 1000 392 V800 H0Z" fill="#88c987"/>
+          <rect y="480" width="1000" height="320" fill="url(#grass)"/>
+          <path d="M505 800 Q650 690 700 610 Q750 558 846 540 L1000 540 V800Z" fill="#e9c698" opacity=".8"/>
+          <!-- distant trees -->
+          <g stroke="#986c46" stroke-width="20" stroke-linecap="round">
+            <path d="M87 422 V295 M310 388 V277 M961 415 V306"/>
+          </g>
+          <g fill="#4eaa73"><circle cx="67" cy="276" r="66"/><circle cx="126" cy="284" r="54"/><circle cx="307" cy="270" r="65"/><circle cx="961" cy="270" r="72"/></g>
+          <g fill="#68bd7d"><circle cx="83" cy="247" r="55"/><circle cx="283" cy="245" r="45"/><circle cx="945" cy="240" r="55"/></g>
+          <!-- stable -->
+          <g>
+            <rect x="580" y="329" width="356" height="280" rx="5" fill="#db956c"/>
+            <path d="M548 335 L756 183 L969 335Z" fill="url(#roof)"/>
+            <path d="M568 335 L756 207 L950 335" fill="none" stroke="#e9ab7f" stroke-width="13" stroke-linejoin="round"/>
+            <path d="M580 392 H938 M580 459 H938 M580 525 H938" stroke="#bc7458" stroke-width="8" opacity=".6"/>
+            <rect x="623" y="408" width="111" height="201" rx="7" fill="#895e48"/><rect x="783" y="408" width="112" height="201" rx="7" fill="#895e48"/>
+            <path d="M623 408 L734 609 M734 408 L623 609 M783 408 L895 609 M895 408 L783 609" stroke="#b8795a" stroke-width="10"/>
+            <path d="M623 508 H734 M783 508 H895" stroke="#e4ac7f" stroke-width="9"/>
+            <circle cx="720" cy="507" r="6" fill="#f9d77f"/><circle cx="799" cy="507" r="6" fill="#f9d77f"/>
+            <rect x="718" y="263" width="76" height="54" rx="9" fill="#f4dfab" stroke="#f6c895" stroke-width="9"/>
+            <path d="M756 263 V317 M718 289 H794" stroke="#bd7d63" stroke-width="7"/>
+            <rect x="689" y="348" width="139" height="40" rx="12" fill="#fff3cb" stroke="#99674c" stroke-width="5"/>
+            <text x="758" y="376" text-anchor="middle" font-size="25" font-family="Trebuchet MS, sans-serif" font-weight="bold" fill="#80513d">PFERDEHOF</text>
+          </g>
+          <!-- paddock fences -->
+          <g stroke="#f4e5bd" stroke-width="14" stroke-linecap="round">
+            <path d="M31 480 H564 M35 553 H565 M35 660 H560 M35 728 H566"/>
+            <path d="M50 458 V735 M180 458 V735 M312 458 V735 M445 458 V735 M555 458 V735"/>
+          </g>
+          <g stroke="#ad8457" stroke-width="3" opacity=".5">
+            <path d="M31 485 H564 M35 558 H565 M35 665 H560 M35 733 H566"/>
+          </g>
+          <!-- pony (back) -->
+          <g transform="translate(333 452)">
+            <path d="M15 95 Q-14 77 -10 35" fill="none" stroke="#8f574a" stroke-width="19" stroke-linecap="round"/>
+            <rect x="29" y="84" width="19" height="112" rx="9" fill="#a16a55"/><rect x="138" y="85" width="19" height="112" rx="9" fill="#a16a55"/>
+            <ellipse cx="90" cy="90" rx="97" ry="60" fill="#b97f5e"/>
+            <path d="M139 77 L163 -4 L208 5 L194 95Z" fill="#b97f5e"/>
+            <path d="M159 -6 L154 -37 L178 -19 L189 -39 L207 -8" fill="#734b3e"/>
+            <ellipse cx="198" cy="11" rx="33" ry="29" fill="#b97f5e"/><ellipse cx="218" cy="26" rx="27" ry="19" fill="#d4a185"/>
+            <circle cx="202" cy="4" r="5" fill="#342f2a"/><circle cx="226" cy="22" r="3" fill="#68493d"/>
+            <path d="M150 0 Q130 26 147 59" fill="none" stroke="#704939" stroke-width="16" stroke-linecap="round"/>
+            <path d="M41 96 L38 185 M145 98 L151 185" stroke="#a16a55" stroke-width="19" stroke-linecap="round"/>
+            <path d="M27 192 H55 M136 192 H166" stroke="#62483c" stroke-width="9" stroke-linecap="round"/>
+          </g>
+          <!-- foreground horse -->
+          <g transform="translate(95 469)">
+            <path d="M55 119 Q10 109 14 61" fill="none" stroke="#7d5246" stroke-width="24" stroke-linecap="round"/>
+            <path d="M73 131 L67 273 M218 130 L230 274" stroke="#b98054" stroke-width="26" stroke-linecap="round"/>
+            <ellipse cx="144" cy="117" rx="111" ry="71" fill="#cd9966"/>
+            <path d="M213 95 L236 -11 Q260 -35 286 -16 L273 111Z" fill="#cd9966"/>
+            <path d="M230 -7 Q209 28 229 66" fill="none" stroke="#7f5944" stroke-width="24" stroke-linecap="round"/>
+            <path d="M252 -12 L248 -56 Q263 -71 274 -38 L286 -61 Q303 -50 303 -17" fill="#cd9966"/>
+            <ellipse cx="288" cy="7" rx="47" ry="41" fill="#cd9966"/>
+            <ellipse cx="311" cy="28" rx="39" ry="26" fill="#f5d4b1"/>
+            <path d="M94 58 Q125 91 178 66" stroke="#fff5d8" stroke-width="13" fill="none" stroke-linecap="round"/>
+            <circle cx="294" cy="-1" r="7" fill="#2c322c"/><circle cx="334" cy="26" r="4" fill="#7b5d4a"/>
+            <path d="M67 270 H96 M218 271 H247" stroke="#715144" stroke-width="13" stroke-linecap="round"/>
+            <path d="M244 17 Q287 65 326 44" fill="none" stroke="#fff9e5" stroke-width="5" opacity=".7"/>
+          </g>
+          <!-- water trough, hay, plants -->
+          <g><ellipse cx="570" cy="702" rx="66" ry="21" fill="#4e956f" opacity=".3"/><path d="M513 667 H627 L616 704 H526Z" fill="#6da4ae"/><ellipse cx="570" cy="667" rx="57" ry="13" fill="#a5e5e8"/></g>
+          <g fill="#eaca67"><path d="M730 625 Q769 584 800 624 L813 667 H713Z"/><path d="M776 618 Q823 574 859 625 L855 676 H770Z"/></g>
+          <g fill="#fff9da">
+            <circle cx="80" cy="751" r="9"/><circle cx="100" cy="744" r="9"/><circle cx="90" cy="734" r="9"/><circle cx="90" cy="758" r="9"/>
+            <circle cx="650" cy="742" r="10"/><circle cx="671" cy="735" r="10"/><circle cx="660" cy="725" r="10"/><circle cx="660" cy="752" r="10"/>
+          </g>
+          <g fill="#edb456"><circle cx="90" cy="746" r="7"/><circle cx="660" cy="738" r="7"/></g>
+          <g fill="#f6a6b0"><circle cx="425" cy="755" r="9"/><circle cx="444" cy="747" r="9"/><circle cx="435" cy="738" r="9"/><circle cx="435" cy="762" r="9"/></g>
+          <circle cx="435" cy="750" r="7" fill="#f9d673"/>
+          <g stroke="#3c9c64" stroke-width="4" stroke-linecap="round"><path d="M90 761 V789 M660 753 V786 M435 764 V789 M24 763 L18 735 M969 769 L977 734"/></g>
+          <g fill="#ef8b91"><path d="M70 345 q-30 -26 -21 -45 q30 -8 32 24 q8 -29 37 -17 q-3 31 -42 39Z"/></g>
+          <path d="M81 328 Q93 356 112 364" fill="none" stroke="#78554d" stroke-width="4"/>
+          <g fill="#fff" opacity=".8"><circle cx="45" cy="60" r="4"/><circle cx="372" cy="74" r="5"/><circle cx="942" cy="165" r="5"/></g>
+        </svg>
+        <div id="pieces" class="pieces"></div>
+      </section>
+    </div>
+    <p class="below" id="status" role="status" aria-live="polite">Tippe auf ein Puzzleteil und rechne los!</p>
+    <section id="finish" class="finish" hidden aria-live="polite">
+      <h2>🎉 Hurra! Der Pferdehof ist fertig!</h2>
+      <p>Du hast alle 20 Plusaufgaben gelöst. Das war toll!</p>
+      <button type="button" id="playAgain" class="play-again">Noch ein Puzzle 🐴</button>
+    </section>
+  </main>
+  <dialog id="questionDialog" class="question-dialog" aria-labelledby="questionTitle">
+    <div id="questionCard" class="question-card">
+      <button type="button" id="closeDialog" class="close-dialog" aria-label="Aufgabe schließen">×</button>
+      <p class="question-kicker">✦ Ein Puzzleteil lösen ✦</p>
+      <h2 id="questionTitle">Was ist das Ergebnis?</h2>
+      <div class="big-math" id="equation"></div>
+      <p id="feedback" class="feedback" aria-live="polite">Tippe auf die richtige Zahl!</p>
+      <div id="answers" class="answers" aria-label="Wähle eine Zahl von 0 bis 12"></div>
+      <p class="question-hint">Du darfst es so oft versuchen, wie du möchtest.</p>
+    </div>
+  </dialog>
+  <script>
+    "use strict";
+    const COUNT = 20;
+    const tiles = document.getElementById("pieces");
+    const dialog = document.getElementById("questionDialog");
+    const equation = document.getElementById("equation");
+    const feedback = document.getElementById("feedback");
+    const card = document.getElementById("questionCard");
+    const progressLabel = document.getElementById("progressLabel");
+    const progressTrack = document.getElementById("progressTrack");
+    const progressFill = document.getElementById("progressFill");
+    const statusText = document.getElementById("status");
+    const finish = document.getElementById("finish");
+    const board = document.getElementById("board");
+    let problems = [];
+    let solved = new Set();
+    let selected = null;
+
+    // Each task is addition only; both addends are positive and their sum is at most 12.
+    function newProblems() {
+      const sums = Array.from({ length: COUNT }, (_, i) => 2 + ((i * 7) % 11));
+      const tasks = sums.map((sum) => {
+        const a = 1 + Math.floor(Math.random() * (sum - 1));
+        return { a, b: sum - a, result: sum };
+      });
+      // Fisher-Yates: change both the tile order and the problems when restarting.
+      for (let i = tasks.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [tasks[i], tasks[j]] = [tasks[j], tasks[i]];
+      }
+      return tasks;
+    }
+
+    function updateProgress() {
+      const amount = solved.size;
+      progressLabel.textContent = amount + " von " + COUNT + " geschafft";
+      progressTrack.setAttribute("aria-valuenow", String(amount));
+      progressFill.style.width = (amount / COUNT * 100) + "%";
+    }
+
+    function startGame() {
+      if (dialog.open) dialog.close();
+      selected = null;
+      solved = new Set();
+      problems = newProblems();
+      tiles.replaceChildren();
+      finish.hidden = true;
+      board.classList.remove("win");
+      statusText.textContent = "Tippe auf ein Puzzleteil und rechne los!";
+      problems.forEach((problem, index) => {
+        const tile = document.createElement("button");
+        tile.type = "button";
+        tile.className = "tile";
+        tile.setAttribute("aria-label", "Puzzleteil " + (index + 1) + ": " + problem.a + " plus " + problem.b);
+        tile.innerHTML = '<span class="tile__inner"><span class="tile__front"><span class="tile__mark" aria-hidden="true">✦</span><span class="tile__math"><span>' +
+          problem.a + " + " + problem.b + '</span><span>= ?</span></span></span><span class="tile__back" aria-hidden="true"></span></span>';
+        tile.addEventListener("click", () => openQuestion(index));
+        tiles.appendChild(tile);
+      });
+      updateProgress();
+    }
+
+    function openQuestion(index) {
+      if (solved.has(index)) return;
+      selected = index;
+      const task = problems[index];
+      equation.textContent = task.a + " + " + task.b + " = ?";
+      feedback.textContent = "Tippe auf die richtige Zahl!";
+      feedback.classList.remove("retry");
+      card.classList.remove("shake");
+      dialog.showModal();
+      document.querySelector(".number").focus();
+    }
+
+    function answer(value) {
+      if (selected === null || solved.has(selected)) return;
+      const problem = problems[selected];
+      if (value !== problem.result) {
+        feedback.textContent = "Fast! Versuch es noch einmal. 💛";
+        feedback.classList.add("retry");
+        card.classList.remove("shake");
+        void card.offsetWidth;
+        card.classList.add("shake");
+        return;
+      }
+      const index = selected;
+      solved.add(index);
+      const tile = tiles.children[index];
+      dialog.close();
+      tile.classList.add("solved");
+      tile.disabled = true;
+      tile.setAttribute("aria-label", "Puzzleteil " + (index + 1) + " gelöst");
+      updateProgress();
+      statusText.textContent = "Richtig gerechnet! Ein Stück vom Pferdehof ist zu sehen. ⭐";
+      if (solved.size === COUNT) {
+        board.classList.add("win");
+        setTimeout(() => {
+          finish.hidden = false;
+          statusText.textContent = "Alle Puzzleteile sind umgedreht!";
+          finish.scrollIntoView({ behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth", block: "nearest" });
+        }, 780);
+      }
+    }
+
+    const answers = document.getElementById("answers");
+    for (let value = 0; value <= 12; value++) {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "number";
+      button.textContent = String(value);
+      button.setAttribute("aria-label", "Antwort " + value);
+      button.addEventListener("click", () => answer(value));
+      answers.appendChild(button);
+    }
+    document.getElementById("closeDialog").addEventListener("click", () => dialog.close());
+    dialog.addEventListener("close", () => { selected = null; });
+    document.getElementById("restart").addEventListener("click", startGame);
+    document.getElementById("playAgain").addEventListener("click", () => {
+      startGame();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+    startGame();
+  </script>
+</body>
+</html>
