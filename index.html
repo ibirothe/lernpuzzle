@@ -89,6 +89,18 @@
     @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; } }
 
     [hidden] { display: none !important; }
+    .mode-options { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 15px; margin-top: 21px; }
+    .mode-option { display:flex; align-items:center; flex-direction:column; justify-content:center; gap:8px; text-align:center; background:#edf8ed; color:#225e47; min-height:177px; padding:22px 12px; border:3px solid #cde3d1; border-radius:20px; font-weight:900; font-size:1.35rem; }
+    .mode-option:hover,.mode-option:focus-visible { border-color:#348c66; background:#dff3e5; }
+    .mode-option .mode-icon { font-size:3rem; line-height:1.1; }
+    .mode-option small { font-weight:600; font-size:.88rem; color:#5b7666; }
+    .mode-option.reading { background:#fef3df; border-color:#f0dab3; }
+    .mode-option.reading:hover,.mode-option.reading:focus-visible { background:#fff0ce; border-color:#dca352; }
+    .mode-back { margin-bottom:14px; padding:9px 12px; font-weight:900; color:#2f7054; background:#ebf6ed; border:0; border-radius:12px; }
+    .reading-plan { margin: 22px 0; padding:20px; background:#f5f9f2; border:2px dashed #b5d5b9; border-radius:18px; text-align:center; }
+    .reading-plan h3 { margin:0 0 10px; font-size:1.2rem; }
+    .reading-plan p { line-height:1.55; margin:0; }
+    @media(max-width:400px) { .mode-options { gap:8px; } .mode-option { padding:16px 5px; font-size:1.1rem; min-height:150px; } .mode-option .mode-icon { font-size:2.5rem; } }
     .setup { max-width: 850px; background: #fffefa; margin: auto; padding: clamp(16px,4vw,32px); border-radius: 25px; box-shadow: 0 12px 38px #346d4b21; }
     .setup h2 { font-size: clamp(1.5rem,4vw,2rem); color: #23634d; text-align: center; margin: 0 0 8px; }
     .setup p { text-align: center; color: #647e70; margin: 0 0 22px; }
@@ -134,11 +146,20 @@
   <main class="app">
     <header class="heading">
       <div class="eyebrow">✦ Rechnen · Puzzeln · Staunen ✦</div>
-      <h1>Das Pferdehof-Puzzle 🐴</h1>
-      <p class="intro">Wähle dein Puzzle aus, rechne bis 12 und entdecke ein wunderschönes Pferdebild!</p>
+      <h1>Das Pferde-Puzzle 🐴</h1>
+      <p class="intro">Rechnen oder Lesen: Wähle deine Übung und entdecke beim Puzzeln ein Pferdebild!</p>
     </header>
-<section id="setup" class="setup" aria-labelledby="setupTitle">
-      <h2 id="setupTitle">🌟 Stell dir dein Puzzle zusammen!</h2>
+<section id="modeSelection" class="setup" aria-labelledby="modeTitle">
+      <h2 id="modeTitle">Was möchtest du üben?</h2>
+      <p>Such dir aus, womit du heute spielen möchtest.</p>
+      <div class="mode-options">
+        <button type="button" id="chooseMath" class="mode-option"><span class="mode-icon" aria-hidden="true">➕</span>Rechnen<small>Plus und Minus üben</small></button>
+        <button type="button" id="chooseReading" class="mode-option reading"><span class="mode-icon" aria-hidden="true">📖</span>Lesen<small>Unser nächstes Lernspiel</small></button>
+      </div>
+    </section>
+    <section id="setup" class="setup" aria-labelledby="setupTitle" hidden>
+      <button type="button" id="backToModesMath" class="mode-back">← Rechnen oder Lesen wählen</button>
+      <h2 id="setupTitle">🌟 Rechenpuzzle auswählen</h2>
       <p>Du entscheidest, wie du spielen möchtest.</p>
       <form id="setupForm">
         <fieldset class="choice-group"><legend>🧩 Wie viele Puzzleteile?</legend><div class="choices"><div class="choice"><input id="count0" type="radio" name="count" value="8" checked><label for="count0"><span class="choice-icon">🧩</span>8 Teile</label></div><div class="choice"><input id="count1" type="radio" name="count" value="16" ><label for="count1"><span class="choice-icon">🧩</span>16 Teile</label></div><div class="choice"><input id="count2" type="radio" name="count" value="30" ><label for="count2"><span class="choice-icon">🧩</span>30 Teile</label></div></div></fieldset>
@@ -152,6 +173,16 @@
         </div>
         <button class="start-button" type="submit">🐎 Puzzle starten!</button>
       </form>
+    </section>
+    <section id="readingSetup" class="setup" aria-labelledby="readingTitle" hidden>
+      <button type="button" id="backToModesReading" class="mode-back">← Rechnen oder Lesen wählen</button>
+      <h2 id="readingTitle">📖 Das Lese-Puzzle</h2>
+      <p>Auch beim Lesen soll sich mit jeder richtigen Antwort ein Pferdebild aufdecken.</p>
+      <div class="reading-plan">
+        <h3>Hier entsteht das Lesespiel</h3>
+        <p>Die Modusauswahl ist vorbereitet. Als Nächstes legen wir gemeinsam fest, welche Leseaufgaben und Schwierigkeitsstufen es geben soll. Der Rechenmodus ist weiterhin vollständig spielbar.</p>
+      </div>
+      <button type="button" id="readingToMath" class="play-again">Inzwischen Rechnen spielen</button>
     </section>
     <section id="game" hidden aria-label="Dein Rechenpuzzle">
       <p id="roundInfo" class="round-info"></p>
@@ -345,6 +376,24 @@
 "use strict";
 const tiles=document.getElementById("pieces");
 const setup=document.getElementById("setup"), game=document.getElementById("game"),form=document.getElementById("setupForm");
+const modeSelection=document.getElementById("modeSelection"),readingSetup=document.getElementById("readingSetup");
+function openMode(mode){
+  modeSelection.hidden=true;
+  setup.hidden=mode!=="math";
+  readingSetup.hidden=mode!=="reading";
+  game.hidden=true;
+  (mode==="math"?setup:readingSetup).scrollIntoView({behavior:"instant",block:"start"});
+}
+function backToModes(){
+  if(dialog.open)dialog.close();
+  game.hidden=true;setup.hidden=true;readingSetup.hidden=true;modeSelection.hidden=false;
+  modeSelection.scrollIntoView({behavior:"instant",block:"start"});
+}
+document.getElementById("chooseMath").addEventListener("click",()=>openMode("math"));
+document.getElementById("chooseReading").addEventListener("click",()=>openMode("reading"));
+document.getElementById("backToModesMath").addEventListener("click",backToModes);
+document.getElementById("backToModesReading").addEventListener("click",backToModes);
+document.getElementById("readingToMath").addEventListener("click",()=>openMode("math"));
 const dialog=document.getElementById("questionDialog"),equation=document.getElementById("equation");
 const feedback=document.getElementById("feedback"),card=document.getElementById("questionCard");
 const progressLabel=document.getElementById("progressLabel"),progressTrack=document.getElementById("progressTrack");
