@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#e8f7ed">
-  <meta name="description" content="Ein fröhliches Plus-Rechenpuzzle bis 12. Löse Aufgaben und entdecke einen Pferdehof!">
+  <meta name="description" content="Plus- und Minus-Rechenpuzzle bis 12 mit wählbarer Schwierigkeit, Teilezahl und drei Pferdebildern!">
   <title>Das Pferdehof-Puzzle</title>
   <style>
     :root { font-family: "Trebuchet MS", "Arial Rounded MT Bold", system-ui, sans-serif; color: #264b3f; background: #f1faf0; font-synthesis: none; }
@@ -87,6 +87,37 @@
       .question-card { padding-top: 22px; }
     }
     @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; } }
+
+    [hidden] { display: none !important; }
+    .setup { max-width: 850px; background: #fffefa; margin: auto; padding: clamp(16px,4vw,32px); border-radius: 25px; box-shadow: 0 12px 38px #346d4b21; }
+    .setup h2 { font-size: clamp(1.5rem,4vw,2rem); color: #23634d; text-align: center; margin: 0 0 8px; }
+    .setup p { text-align: center; color: #647e70; margin: 0 0 22px; }
+    .choice-group { border: 0; padding: 0; margin: 0 0 22px; min-width: 0; }
+    .choice-group legend { font-weight: 900; font-size: 1.08rem; color: #295c49; margin-bottom: 10px; }
+    .choices { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 8px; }
+    .choice { position: relative; min-width: 0; }
+    .choice input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+    .choice label { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; min-height: 77px; padding: 9px 3px; border-radius: 15px; border: 3px solid #e1eae2; background: #f9fcf7; color: #456959; font-weight: 900; text-align: center; cursor: pointer; font-size: clamp(.8rem,2.5vw,1.03rem); }
+    .choice-icon { font-size: 1.5rem; line-height: 1; }
+    .choice input:checked + label { border-color: #358963; background: #dcf4e4; color: #206744; }
+    .choice input:focus-visible + label { outline: 4px solid #264b3f; outline-offset: 3px; }
+    .start-button { display: block; width: 100%; border: 0; border-radius: 17px; padding: 16px 12px; color: #fff; background: #28885c; font-size: 1.3rem; font-weight: 900; box-shadow: 0 5px 0 #1c6242; }
+    .start-button:active { transform: translateY(2px); box-shadow: 0 3px 0 #1c6242; }
+    .round-info { max-width: 850px; margin: -4px auto 13px; color: #4e7762; text-align: center; font-weight: 800; font-size: .9rem; }
+    .farm-art[hidden] { display: none; }
+    .pieces[data-count="8"] .tile__math { font-size: clamp(1rem,3.7vw,1.65rem); }
+    .pieces[data-count="16"] .tile__math { font-size: clamp(.83rem,3vw,1.4rem); }
+    .pieces[data-count="30"] .tile__math { font-size: clamp(.59rem,2.55vw,1.05rem); }
+    .pieces[data-count="30"] .tile__mark { display: none; }
+    .finish-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
+    .change-choice { padding: 12px 18px; border-radius: 14px; border: 2px solid #368966; background: white; color: #317d5d; font-weight: 900; }
+    @media(max-width:560px) {
+      .setup { border-radius: 18px; }
+      .choices { gap: 5px; }
+      .choice label { min-height: 66px; padding: 7px 2px; }
+      .choice-icon { font-size: 1.3rem; }
+      .pieces[data-count="30"] .tile__math { font-size: clamp(.57rem,2.65vw,.77rem); }
+    }
   </style>
 </head>
 <body>
@@ -94,20 +125,33 @@
     <header class="heading">
       <div class="eyebrow">✦ Rechnen · Puzzeln · Staunen ✦</div>
       <h1>Das Pferdehof-Puzzle 🐴</h1>
-      <p class="intro">Löse die Plusaufgaben und entdecke Stück für Stück einen wunderschönen Pferdehof!</p>
+      <p class="intro">Wähle dein Puzzle aus, rechne bis 12 und entdecke ein wunderschönes Pferdebild!</p>
     </header>
+<section id="setup" class="setup" aria-labelledby="setupTitle">
+      <h2 id="setupTitle">🌟 Stell dir dein Puzzle zusammen!</h2>
+      <p>Du entscheidest, wie du spielen möchtest.</p>
+      <form id="setupForm">
+        <fieldset class="choice-group"><legend>🧩 Wie viele Puzzleteile?</legend><div class="choices"><div class="choice"><input id="count0" type="radio" name="count" value="8" checked><label for="count0"><span class="choice-icon">🧩</span>8 Teile</label></div><div class="choice"><input id="count1" type="radio" name="count" value="16" ><label for="count1"><span class="choice-icon">🧩</span>16 Teile</label></div><div class="choice"><input id="count2" type="radio" name="count" value="30" ><label for="count2"><span class="choice-icon">🧩</span>30 Teile</label></div></div></fieldset>
+        <fieldset class="choice-group"><legend>⭐ Wie schwierig?</legend><div class="choices"><div class="choice"><input id="level0" type="radio" name="level" value="leicht" checked><label for="level0"><span class="choice-icon">🌱</span>Leicht</label></div><div class="choice"><input id="level1" type="radio" name="level" value="mittel" ><label for="level1"><span class="choice-icon">🌻</span>Mittel</label></div><div class="choice"><input id="level2" type="radio" name="level" value="schwer" ><label for="level2"><span class="choice-icon">🚀</span>Schwer</label></div></div></fieldset>
+        <fieldset class="choice-group"><legend>➕➖ Welche Rechenarten?</legend><div class="choices"><div class="choice"><input id="operation0" type="radio" name="operation" value="plus" checked><label for="operation0"><span class="choice-icon">➕</span>Plus</label></div><div class="choice"><input id="operation1" type="radio" name="operation" value="minus" ><label for="operation1"><span class="choice-icon">➖</span>Minus</label></div><div class="choice"><input id="operation2" type="radio" name="operation" value="beides" ><label for="operation2"><span class="choice-icon">✌️</span>Beides</label></div></div></fieldset>
+        <fieldset class="choice-group"><legend>🐴 Welches Pferdebild?</legend><div class="choices"><div class="choice"><input id="scene0" type="radio" name="scene" value="hof" checked><label for="scene0"><span class="choice-icon">🏡</span>Pferdehof</label></div><div class="choice"><input id="scene1" type="radio" name="scene" value="wiese" ><label for="scene1"><span class="choice-icon">🌼</span>Ponywiese</label></div><div class="choice"><input id="scene2" type="radio" name="scene" value="ausflug" ><label for="scene2"><span class="choice-icon">🌄</span>Reitausflug</label></div></div></fieldset>
+        <button class="start-button" type="submit">🐎 Puzzle starten!</button>
+      </form>
+    </section>
+    <section id="game" hidden aria-label="Dein Rechenpuzzle">
+      <p id="roundInfo" class="round-info"></p>
     <div class="toolbar">
       <div class="progress-panel">
-        <div class="progress-text"><span>Deine Puzzleteile</span><strong id="progressLabel">0 von 20 geschafft</strong></div>
-        <div id="progressTrack" class="progress-track" role="progressbar" aria-label="Gelöste Puzzleteile" aria-valuemin="0" aria-valuemax="20" aria-valuenow="0">
+        <div class="progress-text"><span>Deine Puzzleteile</span><strong id="progressLabel">0 von 8 geschafft</strong></div>
+        <div id="progressTrack" class="progress-track" role="progressbar" aria-label="Gelöste Puzzleteile" aria-valuemin="0" aria-valuemax="8" aria-valuenow="0">
           <div id="progressFill" class="progress-fill"></div>
         </div>
       </div>
-      <button type="button" id="restart" class="restart" aria-label="Neues Puzzle starten">↻ Neu spielen</button>
+      <button type="button" id="restart" class="restart" aria-label="Zur Spielauswahl zurückkehren">⚙ Auswahl</button>
     </div>
     <div class="board-frame">
-      <section id="board" class="board" aria-label="Pferdehof-Puzzle mit 20 Rechenaufgaben">
-        <svg class="farm-art" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 800" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Ein sonniger Pferdehof mit Stall, zwei Pferden, Koppel und Blumen">
+      <section id="board" class="board" aria-label="Rechenpuzzle mit aufdeckbarem Pferdebild">
+        <svg class="farm-art" data-scene="hof" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 800" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Ein sonniger Pferdehof mit Stall, zwei Pferden, Koppel und Blumen">
           <defs>
             <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#8bd4ef"/><stop offset="1" stop-color="#e5f8ed"/></linearGradient>
             <linearGradient id="grass" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#9dd17e"/><stop offset="1" stop-color="#5dba73"/></linearGradient>
@@ -192,14 +236,82 @@
           <path d="M81 328 Q93 356 112 364" fill="none" stroke="#78554d" stroke-width="4"/>
           <g fill="#fff" opacity=".8"><circle cx="45" cy="60" r="4"/><circle cx="372" cy="74" r="5"/><circle cx="942" cy="165" r="5"/></g>
         </svg>
+        <svg class="farm-art" data-scene="wiese" hidden xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 800" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Drei Ponys auf einer Blumenwiese mit Regenbogen"><defs><g id="ponyMeadow">
+  <path d="M8 78 Q-31 39 -14 -2" stroke="#6c493e" fill="none" stroke-width="22" stroke-linecap="round"/>
+  <path d="M32 119 L26 240 M161 118 L170 240" stroke="currentColor" stroke-width="24" stroke-linecap="round"/>
+  <ellipse cx="95" cy="91" rx="104" ry="65" fill="currentColor"/>
+  <path d="M157 66 L187 -40 L238 -18 L216 103Z" fill="currentColor"/>
+  <path d="M194 -37 Q172 -13 190 32" stroke="#705044" stroke-width="20" fill="none" stroke-linecap="round"/>
+  <path d="M196 -37 L190 -79 L219 -55 L225 -86 L248 -35" fill="currentColor"/>
+  <ellipse cx="241" cy="-13" rx="45" ry="37" fill="currentColor"/>
+  <ellipse cx="271" cy="8" rx="33" ry="24" fill="#f1d0ad"/>
+  <circle cx="247" cy="-23" r="6" fill="#322c27"/><circle cx="283" cy="10" r="4" fill="#725341"/>
+  <path d="M18 239 H47 M156 240 H188" stroke="#64493f" stroke-width="12" stroke-linecap="round"/>
+</g></defs>
+ <rect width="1000" height="800" fill="#9ad7f6"/>
+ <circle cx="896" cy="106" r="71" fill="#ffdf87"/>
+ <path d="M120 405 A350 350 0 0 1 820 405" fill="none" stroke="#f18e9a" stroke-width="29"/>
+ <path d="M154 405 A316 316 0 0 1 786 405" fill="none" stroke="#f9c86f" stroke-width="28"/>
+ <path d="M187 405 A283 283 0 0 1 753 405" fill="none" stroke="#e8e682" stroke-width="26"/>
+ <path d="M221 405 A249 249 0 0 1 719 405" fill="none" stroke="#8fddb3" stroke-width="25"/>
+ <g fill="#fff"><ellipse cx="140" cy="150" rx="112" ry="32"/><circle cx="108" cy="125" r="47"/><circle cx="180" cy="129" r="49"/><ellipse cx="854" cy="221" rx="93" ry="27"/><circle cx="833" cy="199" r="41"/><circle cx="891" cy="200" r="37"/></g>
+ <path d="M0 455 Q218 336 439 408 Q722 317 1000 421 V800 H0Z" fill="#b3dfa2"/>
+ <path d="M0 531 Q238 440 519 490 Q770 413 1000 489 V800 H0Z" fill="#8bcf89"/>
+ <path d="M0 629 Q450 527 1000 591 V800 H0Z" fill="#62b67a"/>
+ <path d="M91 552 V310" stroke="#916943" stroke-width="29"/>
+ <g fill="#65b976"><circle cx="96" cy="265" r="94"/><circle cx="36" cy="317" r="68"/><circle cx="169" cy="326" r="68"/></g>
+ <g fill="#f1ae67"><circle cx="58" cy="323" r="14"/><circle cx="130" cy="286" r="12"/><circle cx="82" cy="228" r="12"/></g>
+ <path d="M713 539 V421 H924 V539" fill="#fff1cf"/><path d="M679 429 L820 318 L959 429Z" fill="#d9807b"/><rect x="794" y="445" width="67" height="94" fill="#a87f67"/>
+ <g transform="translate(123 534) scale(1.10)" style="color:#d3a06e"><use href="#ponyMeadow"/><path d="M51 76 Q92 40 136 76" fill="none" stroke="#fbe7ba" stroke-width="15"/></g>
+ <g transform="translate(490 569) scale(.78)" style="color:#e5c7aa"><use href="#ponyMeadow"/><ellipse cx="95" cy="93" rx="27" ry="47" fill="#fff0df"/></g>
+ <g transform="translate(736 625) scale(.45)" style="color:#a77a63"><use href="#ponyMeadow"/></g>
+ <g stroke="#429f66" stroke-width="5"><path d="M74 791 V746 M411 791 V743 M646 794 V749 M938 795 V749"/></g>
+ <g fill="#fff7d7"><circle cx="74" cy="736" r="17"/><circle cx="56" cy="751" r="17"/><circle cx="92" cy="751" r="17"/><circle cx="74" cy="768" r="17"/></g><circle cx="74" cy="752" r="11" fill="#f4b95a"/>
+ <g fill="#f7a6bb"><circle cx="411" cy="732" r="17"/><circle cx="393" cy="749" r="17"/><circle cx="429" cy="749" r="17"/><circle cx="411" cy="766" r="17"/></g><circle cx="411" cy="749" r="10" fill="#ffe27a"/>
+ <g fill="#ffdf9c"><circle cx="646" cy="743" r="16"/><circle cx="629" cy="758" r="16"/><circle cx="663" cy="758" r="16"/><circle cx="646" cy="773" r="16"/></g><circle cx="646" cy="758" r="10" fill="#d79d6e"/>
+ <g fill="#ffbed8"><circle cx="938" cy="742" r="16"/><circle cx="921" cy="758" r="16"/><circle cx="955" cy="758" r="16"/><circle cx="938" cy="773" r="16"/></g><circle cx="938" cy="758" r="10" fill="#ffe77b"/>
+ <path d="M394 302 Q418 271 441 301 Q469 277 491 301" fill="none" stroke="#f5a8ce" stroke-width="11" stroke-linecap="round"/>
+</svg>
+        <svg class="farm-art" data-scene="ausflug" hidden xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 800" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Zwei Pferde auf einem Ausflug an einem See vor Bergen"><defs><g id="ponyRide">
+  <path d="M8 78 Q-31 39 -14 -2" stroke="#6c493e" fill="none" stroke-width="22" stroke-linecap="round"/>
+  <path d="M32 119 L26 240 M161 118 L170 240" stroke="currentColor" stroke-width="24" stroke-linecap="round"/>
+  <ellipse cx="95" cy="91" rx="104" ry="65" fill="currentColor"/>
+  <path d="M157 66 L187 -40 L238 -18 L216 103Z" fill="currentColor"/>
+  <path d="M194 -37 Q172 -13 190 32" stroke="#705044" stroke-width="20" fill="none" stroke-linecap="round"/>
+  <path d="M196 -37 L190 -79 L219 -55 L225 -86 L248 -35" fill="currentColor"/>
+  <ellipse cx="241" cy="-13" rx="45" ry="37" fill="currentColor"/>
+  <ellipse cx="271" cy="8" rx="33" ry="24" fill="#f1d0ad"/>
+  <circle cx="247" cy="-23" r="6" fill="#322c27"/><circle cx="283" cy="10" r="4" fill="#725341"/>
+  <path d="M18 239 H47 M156 240 H188" stroke="#64493f" stroke-width="12" stroke-linecap="round"/>
+</g></defs>
+ <rect width="1000" height="800" fill="#b5dbf8"/><circle cx="839" cy="133" r="73" fill="#ffe6a3"/>
+ <g fill="#fff"><ellipse cx="155" cy="129" rx="104" ry="29"/><circle cx="124" cy="107" r="41"/><circle cx="192" cy="109" r="47"/></g>
+ <path d="M0 425 L185 146 L395 415 L565 116 L814 412 L1000 218 V800 H0Z" fill="#94b4bf"/>
+ <path d="M98 270 L185 146 L280 277 L223 251 L190 212 L160 258Z M474 227 L565 116 L655 236 L598 216 L569 186 L541 223Z M921 337 L1000 218 V342Z" fill="#eef7f4"/>
+ <path d="M0 510 Q200 398 425 456 Q705 382 1000 460 V800H0Z" fill="#83be9a"/>
+ <path d="M0 579 Q232 495 482 553 Q722 486 1000 526 V800H0Z" fill="#a4ce91"/>
+ <path d="M0 645 Q400 571 1000 610 V800H0Z" fill="#62b18c"/>
+ <path d="M560 535 Q781 464 1000 540 V731 Q780 716 554 655Z" fill="#83cce3"/>
+ <g stroke="#d7f2f1" stroke-width="9" stroke-linecap="round"><path d="M645 575 Q805 553 938 575 M602 649 Q792 674 979 651 M729 613 Q841 599 962 615"/></g>
+ <path d="M27 800 Q215 628 380 609 Q511 570 598 571 Q523 671 685 800Z" fill="#efd39f"/>
+ <g fill="#3e8b71"><path d="M8 536 L80 325 L150 536Z"/><path d="M105 562 L197 284 L279 562Z"/><path d="M878 523 L943 319 L1010 523Z"/></g>
+ <path d="M74 492 V585 M190 496 V603 M947 472 V552" stroke="#816449" stroke-width="14"/>
+ <g transform="translate(143 500) scale(1.12)" style="color:#bf8a64"><use href="#ponyRide"/><path d="M78 48 Q120 17 167 55" fill="none" stroke="#f8ead5" stroke-width="14"/></g>
+ <g transform="translate(479 526) scale(.71)" style="color:#e7d5b8"><use href="#ponyRide"/><ellipse cx="91" cy="99" rx="28" ry="45" fill="#fff9e9"/></g>
+ <g transform="translate(877 663)"><ellipse cx="0" cy="0" rx="42" ry="23" fill="#fff7dd"/><circle cx="29" cy="-17" r="19" fill="#fff7dd"/><path d="M44 -15 L70 -8 L44 1Z" fill="#e8ae66"/><circle cx="34" cy="-22" r="4" fill="#342c27"/></g>
+ <g stroke="#4e9a69" stroke-width="5"><path d="M68 793 V751 M692 796 V752 M950 797 V745"/></g>
+ <g fill="#fff7dd"><circle cx="68" cy="739" r="16"/><circle cx="50" cy="754" r="16"/><circle cx="86" cy="754" r="16"/><circle cx="68" cy="771" r="16"/></g><circle cx="68" cy="754" r="10" fill="#efb961"/>
+ <g fill="#ffb4c3"><circle cx="692" cy="742" r="16"/><circle cx="675" cy="758" r="16"/><circle cx="709" cy="758" r="16"/><circle cx="692" cy="773" r="16"/></g><circle cx="692" cy="758" r="10" fill="#ffe68e"/>
+</svg>
         <div id="pieces" class="pieces"></div>
       </section>
     </div>
     <p class="below" id="status" role="status" aria-live="polite">Tippe auf ein Puzzleteil und rechne los!</p>
     <section id="finish" class="finish" hidden aria-live="polite">
-      <h2>🎉 Hurra! Der Pferdehof ist fertig!</h2>
-      <p>Du hast alle 20 Plusaufgaben gelöst. Das war toll!</p>
-      <button type="button" id="playAgain" class="play-again">Noch ein Puzzle 🐴</button>
+      <h2>🎉 Hurra! Dein Puzzle ist fertig!</h2>
+      <p id="finishMessage">Du hast alle Aufgaben gelöst. Toll gemacht!</p>
+      <div class="finish-actions"><button type="button" id="playAgain" class="play-again">Nochmal spielen 🐴</button><button type="button" id="changeChoice" class="change-choice">Anderes Puzzle wählen</button></div>
+    </section>
     </section>
   </main>
   <dialog id="questionDialog" class="question-dialog" aria-labelledby="questionTitle">
@@ -214,127 +326,126 @@
     </div>
   </dialog>
   <script>
-    "use strict";
-    const COUNT = 20;
-    const tiles = document.getElementById("pieces");
-    const dialog = document.getElementById("questionDialog");
-    const equation = document.getElementById("equation");
-    const feedback = document.getElementById("feedback");
-    const card = document.getElementById("questionCard");
-    const progressLabel = document.getElementById("progressLabel");
-    const progressTrack = document.getElementById("progressTrack");
-    const progressFill = document.getElementById("progressFill");
-    const statusText = document.getElementById("status");
-    const finish = document.getElementById("finish");
-    const board = document.getElementById("board");
-    let problems = [];
-    let solved = new Set();
-    let selected = null;
 
-    // Each task is addition only; both addends are positive and their sum is at most 12.
-    function newProblems() {
-      const sums = Array.from({ length: COUNT }, (_, i) => 2 + ((i * 7) % 11));
-      const tasks = sums.map((sum) => {
-        const a = 1 + Math.floor(Math.random() * (sum - 1));
-        return { a, b: sum - a, result: sum };
-      });
-      // Fisher-Yates: change both the tile order and the problems when restarting.
-      for (let i = tasks.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [tasks[i], tasks[j]] = [tasks[j], tasks[i]];
-      }
-      return tasks;
-    }
+"use strict";
+const tiles=document.getElementById("pieces");
+const setup=document.getElementById("setup"), game=document.getElementById("game"),form=document.getElementById("setupForm");
+const dialog=document.getElementById("questionDialog"),equation=document.getElementById("equation");
+const feedback=document.getElementById("feedback"),card=document.getElementById("questionCard");
+const progressLabel=document.getElementById("progressLabel"),progressTrack=document.getElementById("progressTrack");
+const progressFill=document.getElementById("progressFill"),statusText=document.getElementById("status");
+const finish=document.getElementById("finish"),board=document.getElementById("board");
+const layouts={8:[4,2],16:[4,4],30:[6,5]},maxValues={leicht:6,mittel:10,schwer:12};
+const sceneNames={hof:"Pferdehof",wiese:"Ponywiese",ausflug:"Reitausflug"};
+let settings={count:8,level:"leicht",operation:"plus",scene:"hof"};
+let problems=[],solved=new Set(),selected=null,winTimer=null;
+function shuffle(arr){
+  for(let i=arr.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]];}
+  return arr;
+}
+// All operands and answers are <=12. Light <=6, medium <=10, hard <=12.
+// Minus never results in a negative number; each category has varied tasks.
+function availableTasks(symbol,max){
+  const tasks=[],minSum=max===6?2:max===10?4:6,minMinuend=max===6?3:max===10?5:7;
+  for(let a=1;a<=max;a++)for(let b=1;b<=max;b++){
+    const result=symbol==="+"?a+b:a-b;
+    if(symbol==="+" && result>=minSum && result<=max) tasks.push({a,b,symbol,result});
+    if(symbol==="−" && a>=minMinuend && b<a) tasks.push({a,b,symbol,result});
+  }
+  return tasks;
+}
+function newProblems(){
+  const max=maxValues[settings.level],plus=shuffle(availableTasks("+",max)),minus=shuffle(availableTasks("−",max));
+  let pi=0,mi=0; const tasks=[];
+  for(let i=0;i<settings.count;i++){
+    const symbol=settings.operation==="beides"?(i%2?"−":"+"):(settings.operation==="minus"?"−":"+");
+    if(symbol==="+"){if(pi===plus.length){shuffle(plus);pi=0;}tasks.push(plus[pi++]);}
+    else {if(mi===minus.length){shuffle(minus);mi=0;}tasks.push(minus[mi++]);}
+  }
+  return shuffle(tasks);
+}
+function readSettings(){
+  const data=new FormData(form),count=Number(data.get("count")),level=data.get("level"),operation=data.get("operation"),scene=data.get("scene");
+  if(!layouts[count]||!Object.prototype.hasOwnProperty.call(maxValues,level)||!["plus","minus","beides"].includes(operation)||!Object.prototype.hasOwnProperty.call(sceneNames,scene))throw Error("Ungültige Puzzle-Auswahl");
+  return {count,level,operation,scene};
+}
+function updateProgress(){
+  const amount=solved.size;
+  progressLabel.textContent=amount+" von "+settings.count+" geschafft";
+  progressTrack.setAttribute("aria-valuenow",String(amount));progressTrack.setAttribute("aria-valuemax",String(settings.count));
+  progressFill.style.width=(100*amount/settings.count)+"%";
+}
+function showSetup(){
+  clearTimeout(winTimer);winTimer=null;
+  if(dialog.open)dialog.close();
+  selected=null;game.hidden=true;setup.hidden=false;
+  setup.scrollIntoView({behavior:"instant",block:"start"});
+}
+function startGame(){
+  clearTimeout(winTimer);winTimer=null;
+  if(dialog.open)dialog.close();
+  selected=null;solved=new Set();problems=newProblems();tiles.replaceChildren();
+  finish.hidden=true;board.classList.remove("win");
+  const [cols,rows]=layouts[settings.count];
+  tiles.style.gridTemplateColumns="repeat("+cols+", minmax(0, 1fr))";
+  tiles.style.gridTemplateRows="repeat("+rows+", minmax(0, 1fr))";
+  tiles.dataset.count=String(settings.count);
+  for(const art of board.querySelectorAll(".farm-art"))art.hidden=art.dataset.scene!==settings.scene;
+  const operationName=settings.operation==="plus"?"Plus":settings.operation==="minus"?"Minus":"Plus & Minus";
+  document.getElementById("roundInfo").textContent=settings.count+" Teile · "+settings.level+" · "+operationName+" · "+sceneNames[settings.scene];
+  document.getElementById("finishMessage").textContent="Du hast alle "+settings.count+" Aufgaben gelöst. Toll gemacht!";
+  board.setAttribute("aria-label",sceneNames[settings.scene]+": "+settings.count+" Rechenaufgaben");
+  statusText.textContent="Tippe auf ein Puzzleteil und rechne los!";
+  problems.forEach((task,index)=>{
+    const tile=document.createElement("button");
+    tile.type="button";tile.className="tile";
+    tile.setAttribute("aria-label","Puzzleteil "+(index+1)+": "+task.a+" "+(task.symbol==="+"?"plus":"minus")+" "+task.b);
+    tile.innerHTML='<span class="tile__inner"><span class="tile__front"><span class="tile__mark" aria-hidden="true">✦</span><span class="tile__math"><span>'+
+      task.a+" "+task.symbol+" "+task.b+'</span><span>= ?</span></span></span><span class="tile__back" aria-hidden="true"></span></span>';
+    tile.addEventListener("click",()=>openQuestion(index));tiles.appendChild(tile);
+  });
+  setup.hidden=true;game.hidden=false;updateProgress();
+  game.scrollIntoView({behavior:"instant",block:"start"});
+}
+function openQuestion(index){
+  if(solved.has(index))return;
+  selected=index;const task=problems[index];
+  equation.textContent=task.a+" "+task.symbol+" "+task.b+" = ?";
+  feedback.textContent="Tippe auf die richtige Zahl!";feedback.classList.remove("retry");card.classList.remove("shake");
+  dialog.showModal();document.querySelector(".number").focus();
+}
+function answer(value){
+  if(selected===null||solved.has(selected))return;
+  if(value!==problems[selected].result){
+    feedback.textContent="Fast! Versuch es noch einmal. 💛";feedback.classList.add("retry");
+    card.classList.remove("shake");void card.offsetWidth;card.classList.add("shake");return;
+  }
+  const index=selected;solved.add(index);const tile=tiles.children[index];
+  dialog.close();selected=null;tile.classList.add("solved");tile.disabled=true;
+  tile.setAttribute("aria-label","Puzzleteil "+(index+1)+" gelöst");updateProgress();
+  statusText.textContent="Richtig gerechnet! Ein Stück vom Bild ist zu sehen. ⭐";
+  if(solved.size===settings.count){
+    board.classList.add("win");
+    winTimer=setTimeout(()=>{
+      finish.hidden=false;statusText.textContent="Alle Puzzleteile sind umgedreht!";
+      finish.scrollIntoView({behavior:window.matchMedia("(prefers-reduced-motion: reduce)").matches?"instant":"smooth",block:"nearest"});
+    },780);
+  }
+}
+const answers=document.getElementById("answers");
+for(let value=0;value<=12;value++){
+  const button=document.createElement("button");
+  button.type="button";button.className="number";button.textContent=String(value);
+  button.setAttribute("aria-label","Antwort "+value);button.addEventListener("click",()=>answer(value));
+  answers.appendChild(button);
+}
+form.addEventListener("submit",event=>{event.preventDefault();settings=readSettings();startGame();});
+document.getElementById("closeDialog").addEventListener("click",()=>dialog.close());
+dialog.addEventListener("close",()=>{selected=null;});
+document.getElementById("restart").addEventListener("click",showSetup);
+document.getElementById("changeChoice").addEventListener("click",showSetup);
+document.getElementById("playAgain").addEventListener("click",startGame);
 
-    function updateProgress() {
-      const amount = solved.size;
-      progressLabel.textContent = amount + " von " + COUNT + " geschafft";
-      progressTrack.setAttribute("aria-valuenow", String(amount));
-      progressFill.style.width = (amount / COUNT * 100) + "%";
-    }
-
-    function startGame() {
-      if (dialog.open) dialog.close();
-      selected = null;
-      solved = new Set();
-      problems = newProblems();
-      tiles.replaceChildren();
-      finish.hidden = true;
-      board.classList.remove("win");
-      statusText.textContent = "Tippe auf ein Puzzleteil und rechne los!";
-      problems.forEach((problem, index) => {
-        const tile = document.createElement("button");
-        tile.type = "button";
-        tile.className = "tile";
-        tile.setAttribute("aria-label", "Puzzleteil " + (index + 1) + ": " + problem.a + " plus " + problem.b);
-        tile.innerHTML = '<span class="tile__inner"><span class="tile__front"><span class="tile__mark" aria-hidden="true">✦</span><span class="tile__math"><span>' +
-          problem.a + " + " + problem.b + '</span><span>= ?</span></span></span><span class="tile__back" aria-hidden="true"></span></span>';
-        tile.addEventListener("click", () => openQuestion(index));
-        tiles.appendChild(tile);
-      });
-      updateProgress();
-    }
-
-    function openQuestion(index) {
-      if (solved.has(index)) return;
-      selected = index;
-      const task = problems[index];
-      equation.textContent = task.a + " + " + task.b + " = ?";
-      feedback.textContent = "Tippe auf die richtige Zahl!";
-      feedback.classList.remove("retry");
-      card.classList.remove("shake");
-      dialog.showModal();
-      document.querySelector(".number").focus();
-    }
-
-    function answer(value) {
-      if (selected === null || solved.has(selected)) return;
-      const problem = problems[selected];
-      if (value !== problem.result) {
-        feedback.textContent = "Fast! Versuch es noch einmal. 💛";
-        feedback.classList.add("retry");
-        card.classList.remove("shake");
-        void card.offsetWidth;
-        card.classList.add("shake");
-        return;
-      }
-      const index = selected;
-      solved.add(index);
-      const tile = tiles.children[index];
-      dialog.close();
-      tile.classList.add("solved");
-      tile.disabled = true;
-      tile.setAttribute("aria-label", "Puzzleteil " + (index + 1) + " gelöst");
-      updateProgress();
-      statusText.textContent = "Richtig gerechnet! Ein Stück vom Pferdehof ist zu sehen. ⭐";
-      if (solved.size === COUNT) {
-        board.classList.add("win");
-        setTimeout(() => {
-          finish.hidden = false;
-          statusText.textContent = "Alle Puzzleteile sind umgedreht!";
-          finish.scrollIntoView({ behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth", block: "nearest" });
-        }, 780);
-      }
-    }
-
-    const answers = document.getElementById("answers");
-    for (let value = 0; value <= 12; value++) {
-      const button = document.createElement("button");
-      button.type = "button";
-      button.className = "number";
-      button.textContent = String(value);
-      button.setAttribute("aria-label", "Antwort " + value);
-      button.addEventListener("click", () => answer(value));
-      answers.appendChild(button);
-    }
-    document.getElementById("closeDialog").addEventListener("click", () => dialog.close());
-    dialog.addEventListener("close", () => { selected = null; });
-    document.getElementById("restart").addEventListener("click", startGame);
-    document.getElementById("playAgain").addEventListener("click", () => {
-      startGame();
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    });
-    startGame();
   </script>
 </body>
 </html>
