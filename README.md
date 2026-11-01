@@ -1,28 +1,32 @@
 # Das Pferdehof-Puzzle 🐴
 
-Ein kinderfreundliches Rechenspiel: **20 Puzzleteile** verdecken ein buntes Bild von einem Pferdehof. Auf jedem Teil steht eine **Plusaufgabe mit einem Ergebnis bis 12**.
+Ein kindgerechtes Rechenpuzzle, bei dem sich mit jeder richtigen Lösung ein Teil eines Pferdebildes aufdeckt.
 
 ## So wird gespielt
 
-1. Ein Puzzleteil antippen.
-2. Die Plusaufgabe ausrechnen.
-3. Die richtige Zahl von **0 bis 12** antippen.
-4. Bei richtiger Antwort dreht sich das Teil automatisch um und zeigt ein Stück des Pferdehofs.
-5. Bei falscher Antwort bleibt die Aufgabe offen und kann beliebig oft erneut versucht werden.
-6. Wenn alle 20 Aufgaben gelöst sind, ist das Bild fertig. Mit **„Noch ein Puzzle“** gibt es neue Aufgaben.
+1. **Vor dem Spiel** vier Einstellungen wählen:
+   - **Puzzleteile:** 8, 16 oder 30
+   - **Schwierigkeit:** Leicht, Mittel oder Schwer
+   - **Rechenarten:** Plus, Minus oder beides (bei „Beides“ möglichst gleich viele Aufgaben jeder Art)
+   - **Bild:** Pferdehof, Ponywiese oder Reitausflug
+2. **„Puzzle starten!“** drücken.
+3. Ein Puzzleteil mit einer Rechenaufgabe antippen.
+4. Die Antwort über die großen Zahlentasten von **0 bis 12** auswählen.
+5. **Richtig:** Das Puzzleteil dreht sich automatisch um und zeigt mehr vom Bild. **Falsch:** Die gleiche Aufgabe darf beliebig oft versucht werden.
+6. Nach dem letzten Teil erscheint die Erfolgsmeldung. Mit **„Nochmal spielen“** gibt es mit denselben Einstellungen eine neue Runde; mit **„Anderes Puzzle wählen“** geht es zurück zur Auswahl. Auch während des Spiels führt **„Auswahl“** zurück.
 
-## Start
+## Schwierigkeitsstufen
 
-`index.html` direkt in einem aktuellen Browser (Chrome, Firefox, Safari oder Edge) öffnen. Das Spiel funktioniert auch ohne Internetverbindung; es benötigt weder Installation noch Anmeldung oder externe Bibliotheken.
+- **Leicht:** Aufgaben mit Zahlen und Ergebnissen bis **6**
+- **Mittel:** Aufgaben mit Zahlen und Ergebnissen bis **10**
+- **Schwer:** Aufgaben mit Zahlen und Ergebnissen bis **12**
 
-Das Spiel unterstützt Maus, Touch und Tastatur. Für Kinder gibt es große Zahlentasten.
+Alle Rechnungen verwenden ganze Zahlen; Minusaufgaben haben **keine negativen Ergebnisse**. Jede Aufgabe hat ein Ergebnis von 0 bis 12. Plus und Minus sind auf alle drei Schwierigkeitsstufen begrenzt. Das ursprüngliche Spielprinzip – rechnen, automatisch umdrehen, bei Fehler erneut versuchen – bleibt erhalten.
 
-## Technische Hinweise
+## Starten
 
-- Reines **HTML, CSS und JavaScript** in einer Datei.
-- Der Pferdehof ist eine integrierte **SVG-Illustration**.
-- Alle Aufgaben sind Additionen mit positiven ganzzahligen Summanden. Das Ergebnis liegt immer zwischen **2 und 12**.
-- Jede neue Runde erzeugt neue Aufgaben und mischt die Puzzleteile.
-- Die Einstellung „Bewegung reduzieren“ wird berücksichtigt.
+`index.html` herunterladen und lokal in einem aktuellen Browser öffnen. Das Spiel ist auch **offline** spielbar: HTML, CSS, JavaScript und alle drei SVG-Bilder sind in derselben Datei enthalten. Es benötigt keine Anmeldung und keine externen Bibliotheken.
+
+Touch, Maus und Tastatur werden unterstützt. Animationen beachten die Systemeinstellung „Bewegung reduzieren“.
 
 Entstanden nach der Idee einer sechsjährigen Spiele-Erfinderin.
