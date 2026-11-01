@@ -117,6 +117,20 @@
     .start-button:active { transform: translateY(2px); box-shadow: 0 3px 0 #1c6242; }
     .round-info { max-width: 850px; margin: -4px auto 13px; color: #4e7762; text-align: center; font-weight: 800; font-size: .9rem; }
     .farm-art { display: none; }
+    .choice label small { font-size:.68rem; font-weight:700; color:#5b7565; line-height:1.3; }
+    .tile__word { display:block; max-width:100%; padding:0 2px; text-align:center; white-space:nowrap; font-size:clamp(.9rem,3.5vw,1.7rem); line-height:1.2; font-weight:900; letter-spacing:-.025em; }
+    .pieces[data-count="16"] .tile__word { font-size:clamp(.64rem,2.7vw,1.25rem); }
+    .pieces[data-count="30"] .tile__word { font-size:clamp(.49rem,2.05vw,.95rem); }
+    .tile__word.long { font-size:clamp(.64rem,2.5vw,1.2rem); letter-spacing:-.06em; }
+    .pieces[data-count="16"] .tile__word.long { font-size:clamp(.55rem,2.15vw,.96rem); }
+    .pieces[data-count="30"] .tile__word.long { font-size:clamp(.44rem,1.65vw,.75rem); }
+    .reading-answer-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:9px; }
+    .reading-answer { min-width:0; min-height:58px; border:2px solid #d3e8d7; background:#eaf6eb; border-radius:14px; padding:5px; font-size:clamp(1.8rem,7vw,2.65rem); line-height:1.2; }
+    .reading-answer:hover,.reading-answer:focus-visible { background:#d3efd8; border-color:#66b585; }
+    .reading-answer:active { transform:scale(.95); }
+    .reading-word { padding:13px 7px; margin:14px 0; border-radius:17px; background:#eaf8e9; color:#267855; font-weight:900; font-size:clamp(2rem,7vw,3.4rem); line-height:1.25; overflow-wrap:anywhere; }
+    @media (max-width:560px) { .reading-answer { min-height:54px; } .pieces[data-count="30"] .tile__word {font-size:clamp(.47rem,2.12vw,.8rem);} .pieces[data-count="30"] .tile__word.long {font-size:clamp(.42rem,1.7vw,.65rem);} }
+
     .farm-art.is-active { display: block; }
     .farm-art[hidden] { display: none !important; }
     .choice input[name="scene"] + label { min-height: 0; padding: 7px; }
@@ -176,13 +190,36 @@
     </section>
     <section id="readingSetup" class="setup" aria-labelledby="readingTitle" hidden>
       <button type="button" id="backToModesReading" class="mode-back">← Rechnen oder Lesen wählen</button>
-      <h2 id="readingTitle">📖 Das Lese-Puzzle</h2>
-      <p>Auch beim Lesen soll sich mit jeder richtigen Antwort ein Pferdebild aufdecken.</p>
-      <div class="reading-plan">
-        <h3>Hier entsteht das Lesespiel</h3>
-        <p>Die Modusauswahl ist vorbereitet. Als Nächstes legen wir gemeinsam fest, welche Leseaufgaben und Schwierigkeitsstufen es geben soll. Der Rechenmodus ist weiterhin vollständig spielbar.</p>
-      </div>
-      <button type="button" id="readingToMath" class="play-again">Inzwischen Rechnen spielen</button>
+      <h2 id="readingTitle">📖 Dein Lese-Puzzle</h2>
+      <p>Lies die Wörter und finde das passende Bild. Jede richtige Antwort zeigt ein Stück deines Pferdebildes!</p>
+      <form id="readingForm">
+        <fieldset class="choice-group"><legend>🧩 Wie viele Puzzleteile?</legend>
+          <div class="choices">
+            <div class="choice"><input id="readingCount8" type="radio" name="count" value="8" checked><label for="readingCount8"><span class="choice-icon">🧩</span>8 Teile</label></div>
+            <div class="choice"><input id="readingCount16" type="radio" name="count" value="16"><label for="readingCount16"><span class="choice-icon">🧩</span>16 Teile</label></div>
+            <div class="choice"><input id="readingCount30" type="radio" name="count" value="30"><label for="readingCount30"><span class="choice-icon">🧩</span>30 Teile</label></div>
+          </div>
+        </fieldset>
+        <fieldset class="choice-group"><legend>⭐ Wie schwierig?</legend>
+          <div class="choices">
+            <div class="choice"><input id="readingLevelEasy" type="radio" name="level" value="leicht" checked><label for="readingLevelEasy"><span class="choice-icon">🌱</span>Leicht<small>GROSSE BUCHSTABEN</small></label></div>
+            <div class="choice"><input id="readingLevelMedium" type="radio" name="level" value="mittel"><label for="readingLevelMedium"><span class="choice-icon">🌻</span>Mittel<small>Einfache Wörter</small></label></div>
+            <div class="choice"><input id="readingLevelHard" type="radio" name="level" value="schwer"><label for="readingLevelHard"><span class="choice-icon">🚀</span>Schwer<small>sch, ei, au, ie …</small></label></div>
+          </div>
+        </fieldset>
+        <fieldset class="choice-group"><legend>🐴 Welches Pferdebild?</legend>
+          <div class="choices">
+            <div class="choice"><input id="readingSceneHof" type="radio" name="scene" value="hof" checked><label for="readingSceneHof">Pferdehof</label></div>
+            <div class="choice"><input id="readingSceneWiese" type="radio" name="scene" value="wiese"><label for="readingSceneWiese">Ponywiese</label></div>
+            <div class="choice"><input id="readingSceneAusflug" type="radio" name="scene" value="ausflug"><label for="readingSceneAusflug">Reitausflug</label></div>
+          </div>
+        </fieldset>
+        <div class="scene-preview-panel" aria-label="Vorschau des ausgewählten Pferdebildes">
+          <strong id="readingScenePreviewName" aria-live="polite">Vorschau: Pferdehof</strong>
+          <div id="readingScenePreview" class="scene-preview-stage" aria-hidden="true"></div>
+        </div>
+        <button type="submit" class="start-button">📖 Lese-Puzzle starten!</button>
+      </form>
     </section>
     <section id="game" hidden aria-label="Dein Rechenpuzzle">
       <p id="roundInfo" class="round-info"></p>
@@ -371,13 +408,30 @@
       <p class="question-hint">Du darfst es so oft versuchen, wie du möchtest.</p>
     </div>
   </dialog>
+  <dialog id="readingDialog" class="question-dialog" aria-labelledby="readingQuestionTitle">
+    <div class="question-card">
+      <button type="button" id="closeReadingDialog" class="close-dialog" aria-label="Aufgabe schließen">×</button>
+      <p class="question-kicker">✦ Leseaufgabe ✦</p>
+      <h2 id="readingQuestionTitle">Welches Bild passt?</h2>
+      <div id="readingWord" class="reading-word"></div>
+      <p id="readingFeedback" class="feedback" role="status" aria-live="polite">Tippe auf das passende Bild!</p>
+      <div id="readingAnswers" class="reading-answer-grid" aria-label="Zwölf Emoji-Bilder zur Auswahl"></div>
+      <p class="question-hint">Du darfst es so oft versuchen, wie du möchtest.</p>
+    </div>
+  </dialog>
   <script>
 
 "use strict";
 const tiles=document.getElementById("pieces");
 const setup=document.getElementById("setup"), game=document.getElementById("game"),form=document.getElementById("setupForm");
+const readingForm=document.getElementById("readingForm");
+const readingDialog=document.getElementById("readingDialog");
+const readingWord=document.getElementById("readingWord");
+const readingAnswers=document.getElementById("readingAnswers");
+const readingFeedback=document.getElementById("readingFeedback");
 const modeSelection=document.getElementById("modeSelection"),readingSetup=document.getElementById("readingSetup");
 function openMode(mode){
+  currentMode=mode;
   modeSelection.hidden=true;
   setup.hidden=mode!=="math";
   readingSetup.hidden=mode!=="reading";
@@ -386,6 +440,7 @@ function openMode(mode){
 }
 function backToModes(){
   if(dialog.open)dialog.close();
+  if(readingDialog.open)readingDialog.close();
   game.hidden=true;setup.hidden=true;readingSetup.hidden=true;modeSelection.hidden=false;
   modeSelection.scrollIntoView({behavior:"instant",block:"start"});
 }
@@ -393,7 +448,6 @@ document.getElementById("chooseMath").addEventListener("click",()=>openMode("mat
 document.getElementById("chooseReading").addEventListener("click",()=>openMode("reading"));
 document.getElementById("backToModesMath").addEventListener("click",backToModes);
 document.getElementById("backToModesReading").addEventListener("click",backToModes);
-document.getElementById("readingToMath").addEventListener("click",()=>openMode("math"));
 const dialog=document.getElementById("questionDialog"),equation=document.getElementById("equation");
 const feedback=document.getElementById("feedback"),card=document.getElementById("questionCard");
 const progressLabel=document.getElementById("progressLabel"),progressTrack=document.getElementById("progressTrack");
@@ -423,6 +477,17 @@ for(const input of form.querySelectorAll('input[name="scene"]')){
   input.addEventListener("change",refreshScenePreview);
 }
 refreshScenePreview();
+const readingScenePreview=document.getElementById("readingScenePreview");
+function refreshReadingScenePreview(){
+  const selected=readingForm.querySelector('input[name="scene"]:checked').value;
+  document.getElementById("readingScenePreviewName").textContent="Vorschau: "+sceneNames[selected];
+  readingScenePreview.replaceChildren(previewSvg(selected,"scene-large"));
+}
+for(const input of readingForm.querySelectorAll('input[name="scene"]')){
+  readingForm.querySelector('label[for="'+input.id+'"]').prepend(previewSvg(input.value,"scene-thumb"));
+  input.addEventListener("change",refreshReadingScenePreview);
+}
+refreshReadingScenePreview();
 function activateScene(scene){
   for(const [name,art] of Object.entries(sceneArt)){
     const visible=name===scene;
@@ -434,6 +499,60 @@ function activateScene(scene){
   }
   board.dataset.scene=scene;
 }
+
+const wordBank=[
+  ...[["🐇","Hase"],["🌙","Mond"],["🌸","Blume"],["🐕","Hund"],["🫏","Esel"],["🦔","Igel"],["🦓","Zebra"],["🐅","Tiger"],["🐘","Elefant"],["🐼","Panda"],["🦙","Lama"],["🦆","Ente"],["🪿","Gans"],["🦅","Adler"],["🐬","Delfin"],["🐋","Wal"],["🐊","Krokodil"],["🦕","Dino"],["🦋","Falter"],["🐷","Ferkel"],["🪱","Wurm"],["🍌","Banane"],["🍋","Zitrone"],["🍉","Melone"],["🍍","Ananas"],["🥝","Kiwi"],["🍅","Tomate"],["🥒","Gurke"],["🍐","Birne"],["🍞","Brot"],["🍰","Torte"],["🍪","Keks"],["🍯","Honig"],["🌷","Tulpe"],["🌹","Rose"],["🌵","Kaktus"],["🍄","Pilz"],["🌴","Palme"],["☁️","Wolke"],["🌧️","Regen"],["🏔️","Berg"],["🚀","Rakete"],["🚌","Bus"],["🚆","Zug"],["🚜","Traktor"],["🚁","Helikopter"],["🛶","Kanu"],["🏰","Burg"],["⛺","Zelt"],["📦","Paket"],["📻","Radio"],["🧹","Besen"],["🎺","Trompete"],["💡","Lampe"],["🎀","Band"],["🧶","Garn"],["👒","Hut"],["👖","Hose"],["👃","Nase"],["✋","Hand"],["👄","Mund"],["💪","Arm"],["👑","Krone"],["🖌️","Pinsel"],["🗺️","Karte"],["⚓","Anker"],["🧲","Magnet"],["🫧","Blase"],["🥤","Limo"],["🧃","Saft"],["🍔","Burger"],["🪡","Nadel"],["🧂","Salz"],["🏆","Pokal"],["🎨","Farbe"],["🚦","Ampel"]].map(([emoji,word])=>({emoji,word,category:0})),
+  ...[["🐁","Maus"],["🏠","Haus"],["🌳","Baum"],["🍇","Traube"],["🐛","Raupe"],["🚗","Auto"],["👁️","Auge"],["🦉","Eule"],["🔥","Feuer"],["🍦","Eis"],["🥚","Ei"],["🪣","Eimer"],["🪜","Leiter"],["🎻","Geige"],["👗","Kleid"],["🦵","Bein"],["🐝","Biene"],["🐐","Ziege"],["📖","Buch"],["🥛","Milch"],["🦊","Fuchs"],["🐂","Ochse"],["🐟","Fisch"],["🐑","Schaf"],["🐸","Frosch"],["🦢","Schwan"],["🐍","Schlange"],["🐌","Schnecke"],["🐎","Pferd"],["🍎","Apfel"],["🦚","Pfau"],["🦁","Löwe"],["🐻","Bär"],["🧀","Käse"],["🪲","Käfer"],["🦘","Känguru"],["☀️","Sonne"],["🌊","Welle"],["🐈","Katze"],["🥕","Karotte"],["🛏️","Bett"],["🎲","Würfel"],["🚪","Tür"],["🧥","Jacke"],["🧦","Socke"],["🔔","Glocke"],["✏️","Stift"],["⭐","Stern"],["🪨","Stein"],["🕷️","Spinne"],["🦈","Hai"],["🍕","Pizza"],["⚽","Ball"],["❄️","Schnee"],["⚡","Blitz"],["🦎","Eidechse"],["🪞","Spiegel"],["🧤","Handschuh"],["👟","Schuh"],["🍒","Kirsche"],["🦀","Krabbe"],["🪙","Münze"],["🦒","Giraffe"],["🌽","Mais"],["🎸","Gitarre"],["🦜","Papagei"],["🦛","Nilpferd"],["🥄","Löffel"],["👓","Brille"],["🪥","Bürste"]].map(([emoji,word])=>({emoji,word,category:1}))
+];
+const readingMaxLength={leicht:5,mittel:7,schwer:9};
+function readReadingSettings(){
+  const data=new FormData(readingForm),count=Number(data.get("count")),level=data.get("level"),scene=data.get("scene");
+  if(!layouts[count]||!Object.prototype.hasOwnProperty.call(readingMaxLength,level)||!Object.prototype.hasOwnProperty.call(sceneNames,scene))throw Error("Ungültige Lese-Auswahl");
+  return {count,level,scene,operation:null};
+}
+function newReadingProblems(){
+  const maxLength=readingMaxLength[settings.level];
+  const simple=shuffle(wordBank.filter(x=>x.category===0&&x.word.length<=maxLength));
+  if(settings.level!=="schwer")return simple.slice(0,settings.count);
+  // Three quarters of the puzzles train special combinations; the rest keep familiar words in play.
+  const special=shuffle(wordBank.filter(x=>x.category===1&&x.word.length<=maxLength));
+  const hardCount=Math.ceil(settings.count*.75);
+  return shuffle([...special.slice(0,hardCount),...simple.slice(0,settings.count-hardCount)]);
+}
+function readingLabel(entry){
+  return settings.level==="leicht"?entry.word.toLocaleUpperCase("de-DE"):entry.word;
+}
+function openReadingQuestion(index){
+  if(solved.has(index))return;
+  selected=index;
+  const task=problems[index];
+  readingWord.textContent=readingLabel(task);
+  readingFeedback.textContent="Tippe auf das passende Bild!";
+  readingFeedback.classList.remove("retry");
+  // One correct emoji, eleven distinct distractors, newly shuffled for each opened task.
+  const distractors=shuffle(wordBank.filter(x=>x.emoji!==task.emoji)).slice(0,11);
+  const choices=shuffle([task,...distractors]);
+  readingAnswers.replaceChildren();
+  for(const choice of choices){
+    const button=document.createElement("button");
+    button.type="button";button.className="reading-answer";
+    button.textContent=choice.emoji;
+    button.setAttribute("aria-label","Bild: "+choice.word);
+    button.addEventListener("click",()=>answerReading(choice.emoji));
+    readingAnswers.appendChild(button);
+  }
+  readingDialog.showModal();
+}
+function answerReading(emoji){
+  if(currentMode!=="reading"||selected===null||solved.has(selected))return;
+  if(emoji!==problems[selected].emoji){
+    readingFeedback.textContent="Das ist noch nicht das richtige Bild. Versuch es noch einmal!";
+    readingFeedback.classList.add("retry");
+    return;
+  }
+  solveSelectedPiece();
+}
+let currentMode="math";
 let settings={count:8,level:"leicht",operation:"plus",scene:"hof"};
 let problems=[],solved=new Set(),selected=null,winTimer=null;
 function shuffle(arr){
@@ -475,13 +594,19 @@ function updateProgress(){
 function showSetup(){
   clearTimeout(winTimer);winTimer=null;
   if(dialog.open)dialog.close();
-  selected=null;game.hidden=true;setup.hidden=false;
-  setup.scrollIntoView({behavior:"instant",block:"start"});
+  if(readingDialog.open)readingDialog.close();
+  selected=null;game.hidden=true;modeSelection.hidden=true;
+  setup.hidden=currentMode!=="math";
+  readingSetup.hidden=currentMode!=="reading";
+  (currentMode==="math"?setup:readingSetup).scrollIntoView({behavior:"instant",block:"start"});
 }
 function startGame(){
   clearTimeout(winTimer);winTimer=null;
   if(dialog.open)dialog.close();
-  selected=null;solved=new Set();problems=newProblems();tiles.replaceChildren();
+  if(readingDialog.open)readingDialog.close();
+  selected=null;solved=new Set();
+  problems=currentMode==="reading"?newReadingProblems():newProblems();
+  tiles.replaceChildren();
   finish.hidden=true;board.classList.remove("win");
   const [cols,rows]=layouts[settings.count];
   tiles.style.gridTemplateColumns="repeat("+cols+", minmax(0, 1fr))";
@@ -489,17 +614,27 @@ function startGame(){
   tiles.dataset.count=String(settings.count);
   activateScene(settings.scene);
   const operationName=settings.operation==="plus"?"Plus":settings.operation==="minus"?"Minus":"Plus & Minus";
-  document.getElementById("roundInfo").textContent=settings.count+" Teile · "+settings.level+" · "+operationName+" · "+sceneNames[settings.scene];
-  document.getElementById("finishMessage").textContent="Du hast alle "+settings.count+" Aufgaben gelöst. Toll gemacht!";
-  board.setAttribute("aria-label",sceneNames[settings.scene]+": "+settings.count+" Rechenaufgaben");
-  statusText.textContent="Tippe auf ein Puzzleteil und rechne los!";
+  document.getElementById("roundInfo").textContent=settings.count+" Teile · "+settings.level+" · "+(currentMode==="reading"?"Lesen":operationName)+" · "+sceneNames[settings.scene];
+  document.getElementById("finishMessage").textContent=currentMode==="reading"?"Du hast alle "+settings.count+" Wörter gelesen. Toll gemacht!":"Du hast alle "+settings.count+" Aufgaben gelöst. Toll gemacht!";
+  board.setAttribute("aria-label",sceneNames[settings.scene]+": "+settings.count+(currentMode==="reading"?" Leseaufgaben":" Rechenaufgaben"));
+  game.setAttribute("aria-label",currentMode==="reading"?"Dein Lese-Puzzle":"Dein Rechenpuzzle");
+  statusText.textContent=currentMode==="reading"?"Tippe auf ein Wort und finde das passende Bild!":"Tippe auf ein Puzzleteil und rechne los!";
   problems.forEach((task,index)=>{
     const tile=document.createElement("button");
     tile.type="button";tile.className="tile";
-    tile.setAttribute("aria-label","Puzzleteil "+(index+1)+": "+task.a+" "+(task.symbol==="+"?"plus":"minus")+" "+task.b);
-    tile.innerHTML='<span class="tile__inner"><span class="tile__front"><span class="tile__mark" aria-hidden="true">✦</span><span class="tile__math"><span>'+
-      task.a+" "+task.symbol+" "+task.b+'</span><span>= ?</span></span></span><span class="tile__back" aria-hidden="true"></span></span>';
-    tile.addEventListener("click",()=>openQuestion(index));tiles.appendChild(tile);
+    if(currentMode==="reading"){
+      const word=readingLabel(task),span=document.createElement("span");
+      span.className="tile__word"+(word.length>6?" long":"");
+      span.textContent=word;
+      tile.setAttribute("aria-label","Puzzleteil "+(index+1)+": "+word);
+      tile.innerHTML='<span class="tile__inner"><span class="tile__front"><span class="tile__mark" aria-hidden="true">✦</span><span class="tile__word-wrap"></span></span><span class="tile__back" aria-hidden="true"></span></span>';
+      tile.querySelector(".tile__word-wrap").replaceWith(span);
+    }else{
+      tile.setAttribute("aria-label","Puzzleteil "+(index+1)+": "+task.a+" "+(task.symbol==="+"?"plus":"minus")+" "+task.b);
+      tile.innerHTML='<span class="tile__inner"><span class="tile__front"><span class="tile__mark" aria-hidden="true">✦</span><span class="tile__math"><span>'+
+        task.a+" "+task.symbol+" "+task.b+'</span><span>= ?</span></span></span><span class="tile__back" aria-hidden="true"></span></span>';
+    }
+    tile.addEventListener("click",()=>currentMode==="reading"?openReadingQuestion(index):openQuestion(index));tiles.appendChild(tile);
   });
   setup.hidden=true;game.hidden=false;updateProgress();
   game.scrollIntoView({behavior:"instant",block:"start"});
@@ -517,10 +652,16 @@ function answer(value){
     feedback.textContent="Fast! Versuch es noch einmal. 💛";feedback.classList.add("retry");
     card.classList.remove("shake");void card.offsetWidth;card.classList.add("shake");return;
   }
+  solveSelectedPiece();
+}
+function solveSelectedPiece(){
+  if(selected===null||solved.has(selected))return;
   const index=selected;solved.add(index);const tile=tiles.children[index];
-  dialog.close();selected=null;tile.classList.add("solved");tile.disabled=true;
+  if(dialog.open)dialog.close();
+  if(readingDialog.open)readingDialog.close();
+  selected=null;tile.classList.add("solved");tile.disabled=true;
   tile.setAttribute("aria-label","Puzzleteil "+(index+1)+" gelöst");updateProgress();
-  statusText.textContent="Richtig gerechnet! Ein Stück vom Bild ist zu sehen. ⭐";
+  statusText.textContent=currentMode==="reading"?"Richtig gelesen! Ein Stück vom Bild ist zu sehen. ⭐":"Richtig gerechnet! Ein Stück vom Bild ist zu sehen. ⭐";
   if(solved.size===settings.count){
     board.classList.add("win");
     winTimer=setTimeout(()=>{
@@ -536,8 +677,11 @@ for(let value=0;value<=12;value++){
   button.setAttribute("aria-label","Antwort "+value);button.addEventListener("click",()=>answer(value));
   answers.appendChild(button);
 }
-form.addEventListener("submit",event=>{event.preventDefault();settings=readSettings();startGame();});
+form.addEventListener("submit",event=>{event.preventDefault();currentMode="math";settings=readSettings();startGame();});
+readingForm.addEventListener("submit",event=>{event.preventDefault();currentMode="reading";settings=readReadingSettings();startGame();});
 document.getElementById("closeDialog").addEventListener("click",()=>dialog.close());
+document.getElementById("closeReadingDialog").addEventListener("click",()=>readingDialog.close());
+readingDialog.addEventListener("close",()=>{selected=null;});
 dialog.addEventListener("close",()=>{selected=null;});
 document.getElementById("restart").addEventListener("click",showSetup);
 document.getElementById("changeChoice").addEventListener("click",showSetup);
