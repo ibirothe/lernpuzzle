@@ -1,10 +1,17 @@
 # Das Pferdehof-Puzzle 🐴
 
-Ein kindgerechtes Rechenpuzzle, bei dem sich mit jeder richtigen Lösung ein Teil eines Pferdebildes aufdeckt.
+Ein kindgerechtes Lernpuzzle mit den Modi **Rechnen** und **Lesen**. Mit jeder richtigen Lösung wird ein Teil eines Pferdebildes sichtbar.
+
+## Entwicklungsstand auf `dev`
+
+- **Modusauswahl:** Nach dem Start kann man zwischen **Rechnen** und **Lesen** wählen.
+- **Rechnen:** Das bisherige Spiel mit allen Einstellungen (8/16/30 Teile, Leicht/Mittel/Schwer, Plus/Minus/Beides, drei Pferdebildern) bleibt vollständig erhalten.
+- **Lesen:** Eigener Bereich und Navigation sind vorbereitet. **Die Leseaufgaben sind noch nicht implementiert.** Wortmaterial und Aufgabenmechanik werden als Nächstes gemeinsam festgelegt.
+- **Deployment:** Die Entwicklung findet auf `dev` statt. GitHub Pages auf `main` bleibt bis zum Merge unverändert.
 
 ## So wird gespielt
 
-1. **Vor dem Spiel** vier Einstellungen wählen:
+1. Zunächst **Rechnen** auswählen; anschließend vier Einstellungen wählen:
    - **Puzzleteile:** 8, 16 oder 30
    - **Schwierigkeit:** Leicht, Mittel oder Schwer
    - **Rechenarten:** Plus, Minus oder beides (bei „Beides“ möglichst gleich viele Aufgaben jeder Art)
