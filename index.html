@@ -104,7 +104,17 @@
     .start-button { display: block; width: 100%; border: 0; border-radius: 17px; padding: 16px 12px; color: #fff; background: #28885c; font-size: 1.3rem; font-weight: 900; box-shadow: 0 5px 0 #1c6242; }
     .start-button:active { transform: translateY(2px); box-shadow: 0 3px 0 #1c6242; }
     .round-info { max-width: 850px; margin: -4px auto 13px; color: #4e7762; text-align: center; font-weight: 800; font-size: .9rem; }
-    .farm-art[hidden] { display: none; }
+    .farm-art { display: none; }
+    .farm-art.is-active { display: block; }
+    .farm-art[hidden] { display: none !important; }
+    .choice input[name="scene"] + label { min-height: 0; padding: 7px; }
+    .scene-thumb { display: block; width: 100%; max-width: 180px; height: auto; aspect-ratio: 5 / 4; border: 1px solid #d5e5d7; border-radius: 10px; overflow: hidden; pointer-events: none; }
+    .scene-preview-panel { margin: -2px 0 20px; padding: 12px 15px; border: 2px solid #d6e8d8; border-radius: 18px; text-align: center; background: #f4faf3; }
+    .scene-preview-panel strong { display: block; color: #23634d; }
+    .scene-preview-stage { width: min(100%, 300px); margin: 9px auto 6px; background: #d9efea; border-radius: 13px; overflow: hidden; }
+    .scene-large { display: block; width: 100%; height: auto; aspect-ratio: 5 / 4; }
+    .scene-preview-panel .scene-preview-hint { margin: 7px 0 0; font-size: .86rem; }
+    @media (max-width: 560px) { .choice input[name="scene"] + label { padding: 4px; } .scene-preview-stage { width: min(100%, 220px); } }
     .pieces[data-count="8"] .tile__math { font-size: clamp(1rem,3.7vw,1.65rem); }
     .pieces[data-count="16"] .tile__math { font-size: clamp(.83rem,3vw,1.4rem); }
     .pieces[data-count="30"] .tile__math { font-size: clamp(.59rem,2.55vw,1.05rem); }
@@ -135,6 +145,11 @@
         <fieldset class="choice-group"><legend>⭐ Wie schwierig?</legend><div class="choices"><div class="choice"><input id="level0" type="radio" name="level" value="leicht" checked><label for="level0"><span class="choice-icon">🌱</span>Leicht</label></div><div class="choice"><input id="level1" type="radio" name="level" value="mittel" ><label for="level1"><span class="choice-icon">🌻</span>Mittel</label></div><div class="choice"><input id="level2" type="radio" name="level" value="schwer" ><label for="level2"><span class="choice-icon">🚀</span>Schwer</label></div></div></fieldset>
         <fieldset class="choice-group"><legend>➕➖ Welche Rechenarten?</legend><div class="choices"><div class="choice"><input id="operation0" type="radio" name="operation" value="plus" checked><label for="operation0"><span class="choice-icon">➕</span>Plus</label></div><div class="choice"><input id="operation1" type="radio" name="operation" value="minus" ><label for="operation1"><span class="choice-icon">➖</span>Minus</label></div><div class="choice"><input id="operation2" type="radio" name="operation" value="beides" ><label for="operation2"><span class="choice-icon">✌️</span>Beides</label></div></div></fieldset>
         <fieldset class="choice-group"><legend>🐴 Welches Pferdebild?</legend><div class="choices"><div class="choice"><input id="scene0" type="radio" name="scene" value="hof" checked><label for="scene0"><span class="choice-icon">🏡</span>Pferdehof</label></div><div class="choice"><input id="scene1" type="radio" name="scene" value="wiese" ><label for="scene1"><span class="choice-icon">🌼</span>Ponywiese</label></div><div class="choice"><input id="scene2" type="radio" name="scene" value="ausflug" ><label for="scene2"><span class="choice-icon">🌄</span>Reitausflug</label></div></div></fieldset>
+        <div class="scene-preview-panel" aria-label="Vorschau des ausgewählten Pferdebildes">
+          <strong id="scenePreviewName" aria-live="polite">Vorschau: Pferdehof</strong>
+          <div id="scenePreview" class="scene-preview-stage" aria-hidden="true"></div>
+          <p class="scene-preview-hint">Dieses Bild deckst du beim Rechnen Stück für Stück auf.</p>
+        </div>
         <button class="start-button" type="submit">🐎 Puzzle starten!</button>
       </form>
     </section>
@@ -337,6 +352,37 @@ const progressFill=document.getElementById("progressFill"),statusText=document.g
 const finish=document.getElementById("finish"),board=document.getElementById("board");
 const layouts={8:[4,2],16:[4,4],30:[6,5]},maxValues={leicht:6,mittel:10,schwer:12};
 const sceneNames={hof:"Pferdehof",wiese:"Ponywiese",ausflug:"Reitausflug"};
+// Separate original SVG scenes remain offline in the puzzle board.
+// Clone their real artwork into the selection screen so every picture can be inspected.
+const sceneArt=Object.fromEntries(Array.from(board.querySelectorAll(".farm-art")).map(art=>[art.dataset.scene,art]));
+function previewSvg(scene,cssClass){
+  const svg=sceneArt[scene].cloneNode(true);
+  svg.hidden=false;svg.removeAttribute("hidden");
+  svg.classList.remove("farm-art","is-active");svg.classList.add(cssClass);
+  svg.removeAttribute("data-scene");svg.removeAttribute("role");svg.removeAttribute("aria-label");
+  svg.setAttribute("aria-hidden","true");
+  return svg;
+}
+const scenePreview=document.getElementById("scenePreview");
+function refreshScenePreview(){
+  const selected=form.querySelector('input[name="scene"]:checked').value;
+  document.getElementById("scenePreviewName").textContent="Vorschau: "+sceneNames[selected];
+  scenePreview.replaceChildren(previewSvg(selected,"scene-large"));
+}
+for(const input of form.querySelectorAll('input[name="scene"]')){
+  form.querySelector('label[for="'+input.id+'"]').prepend(previewSvg(input.value,"scene-thumb"));
+  input.addEventListener("change",refreshScenePreview);
+}
+refreshScenePreview();
+function activateScene(scene){
+  for(const [name,art] of Object.entries(sceneArt)){
+    const visible=name===scene;
+    art.hidden=!visible;
+    art.classList.toggle("is-active",visible);
+    art.setAttribute("aria-hidden",String(!visible));
+  }
+  board.dataset.scene=scene;
+}
 let settings={count:8,level:"leicht",operation:"plus",scene:"hof"};
 let problems=[],solved=new Set(),selected=null,winTimer=null;
 function shuffle(arr){
@@ -390,7 +436,7 @@ function startGame(){
   tiles.style.gridTemplateColumns="repeat("+cols+", minmax(0, 1fr))";
   tiles.style.gridTemplateRows="repeat("+rows+", minmax(0, 1fr))";
   tiles.dataset.count=String(settings.count);
-  for(const art of board.querySelectorAll(".farm-art"))art.hidden=art.dataset.scene!==settings.scene;
+  activateScene(settings.scene);
   const operationName=settings.operation==="plus"?"Plus":settings.operation==="minus"?"Minus":"Plus & Minus";
   document.getElementById("roundInfo").textContent=settings.count+" Teile · "+settings.level+" · "+operationName+" · "+sceneNames[settings.scene];
   document.getElementById("finishMessage").textContent="Du hast alle "+settings.count+" Aufgaben gelöst. Toll gemacht!";
