@@ -377,7 +377,9 @@ refreshScenePreview();
 function activateScene(scene){
   for(const [name,art] of Object.entries(sceneArt)){
     const visible=name===scene;
-    art.hidden=!visible;
+    // SVGElement.hidden does not reliably remove the hidden attribute.
+    // Toggle the attribute itself so the selected scene can render.
+    art.toggleAttribute("hidden", !visible);
     art.classList.toggle("is-active",visible);
     art.setAttribute("aria-hidden",String(!visible));
   }
