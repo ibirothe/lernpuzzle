@@ -1,32 +1,43 @@
-# Das Pferdehof-Puzzle 🐴
+# Das Pferde-Puzzle 🐴
 
-Ein kindgerechtes Rechenpuzzle, bei dem sich mit jeder richtigen Lösung ein Teil eines Pferdebildes aufdeckt.
+Ein kinderfreundliches Lernpuzzle mit zwei Modi: **Rechnen** und **Lesen**. Jede richtig beantwortete Aufgabe deckt ein Teil eines ausgewählten Pferdebildes auf.
 
-## So wird gespielt
+## Spielstart
 
-1. **Vor dem Spiel** vier Einstellungen wählen:
-   - **Puzzleteile:** 8, 16 oder 30
-   - **Schwierigkeit:** Leicht, Mittel oder Schwer
-   - **Rechenarten:** Plus, Minus oder beides (bei „Beides“ möglichst gleich viele Aufgaben jeder Art)
-   - **Bild:** Pferdehof, Ponywiese oder Reitausflug
-2. **„Puzzle starten!“** drücken.
-3. Ein Puzzleteil mit einer Rechenaufgabe antippen.
-4. Die Antwort über die großen Zahlentasten von **0 bis 12** auswählen.
-5. **Richtig:** Das Puzzleteil dreht sich automatisch um und zeigt mehr vom Bild. **Falsch:** Die gleiche Aufgabe darf beliebig oft versucht werden.
-6. Nach dem letzten Teil erscheint die Erfolgsmeldung. Mit **„Nochmal spielen“** gibt es mit denselben Einstellungen eine neue Runde; mit **„Anderes Puzzle wählen“** geht es zurück zur Auswahl. Auch während des Spiels führt **„Auswahl“** zurück.
+Beim Öffnen zuerst **Rechnen** oder **Lesen** wählen. Beide Modi besitzen eigene Einstellungen für **8, 16 oder 30 Puzzleteile**, **Leicht / Mittel / Schwer** und eines von drei Bildern: **Pferdehof**, **Ponywiese**, **Reitausflug**.
 
-## Schwierigkeitsstufen
+### Rechnen
 
-- **Leicht:** Aufgaben mit Zahlen und Ergebnissen bis **6**
-- **Mittel:** Aufgaben mit Zahlen und Ergebnissen bis **10**
-- **Schwer:** Aufgaben mit Zahlen und Ergebnissen bis **12**
+Die bestehende Rechenlogik und die Plus-/Minus-Auswahl bleiben unverändert:
 
-Alle Rechnungen verwenden ganze Zahlen; Minusaufgaben haben **keine negativen Ergebnisse**. Jede Aufgabe hat ein Ergebnis von 0 bis 12. Plus und Minus sind auf alle drei Schwierigkeitsstufen begrenzt. Das ursprüngliche Spielprinzip – rechnen, automatisch umdrehen, bei Fehler erneut versuchen – bleibt erhalten.
+- **Leicht:** Zahlen bis 6
+- **Mittel:** Zahlen bis 10
+- **Schwer:** Zahlen bis 12
+- Rechenarten: **Plus**, **Minus** oder **beides**.
+- Antippen eines Puzzleteils öffnet die Aufgabe. Eine der Antwortzahlen 0–12 ist richtig, Fehler können wiederholt werden.
 
-## Starten
+### Lesen
 
-`index.html` herunterladen und lokal in einem aktuellen Browser öffnen. Das Spiel ist auch **offline** spielbar: HTML, CSS, JavaScript und alle drei SVG-Bilder sind in derselben Datei enthalten. Es benötigt keine Anmeldung und keine externen Bibliotheken.
+Jedes Puzzleteil zeigt ein **Wort**. Beim Antippen erscheint das Wort groß und eine Auswahl mit **12 verschiedenen Emojis**. Genau eines davon passt zum Wort; seine Position ist pro Aufgabe zufällig.
 
-Touch, Maus und Tastatur werden unterstützt. Animationen beachten die Systemeinstellung „Bewegung reduzieren“.
+- **Leicht:** ausschließlich **Kategorie 0**, maximal fünf Buchstaben, **nur Großbuchstaben** (z. B. `HASE`).
+- **Mittel:** ausschließlich **Kategorie 0**, maximal sieben Buchstaben, normale Groß- und Kleinschreibung (z. B. `Blume`).
+- **Schwer:** Wörter aus beiden Kategorien, normale Groß- und Kleinschreibung, maximal neun Buchstaben; ungefähr **75 % Kategorie 1** (z. B. `Schaf`, `Biene`, `Maus`).
+- **Kategorie 0:** ohne besondere Buchstabenkombinationen; **Kategorie 1:** u. a. `sch`, `ch`, `ei`, `ie`, `au`, `eu`, Umlaute, `pf`, `ck`, `tz`, auffällige Doppelkonsonanten.
+- Der Wortkatalog umfasst **146 fest zugeordnete Emoji-Wort-Paare** (76 in Kategorie 0, 70 in Kategorie 1).
+- Die Auswahl ist bei jeder Aufgabe neu gemischt und enthält die passende Antwort **genau einmal**.
+- Falsche Antworten können beliebig oft erneut versucht werden. Richtige Antworten decken automatisch das betreffende Puzzleteil auf.
+
+### Nach einer Runde
+
+Mit **„Nochmal spielen“** wird eine neue Runde im selben Modus und mit denselben Einstellungen gestartet. **„Anderes Puzzle wählen“** oder **„Auswahl“** führen zur Einstellung des aktuellen Modus zurück. Von dort kann man auch zwischen Rechnen und Lesen wechseln.
+
+## Start und Deployment
+
+`index.html` lokal im Browser öffnen. Alle Spiellogik, alle drei SVG-Bilder und der Wortschatz befinden sich in der Datei; das Spiel ist **offline** nutzbar. Es unterstützt Maus, Touch und Tastatur. Reduzierte Bewegung wird berücksichtigt.
+
+- Entwicklung: Branch **`dev`**
+- GitHub Pages / öffentliche Version: Branch **`main`** (wird durch diese Entwicklung **nicht** verändert)
+- Veröffentlichung des Lesemodus erst nach Review und Merge von `dev` nach `main`
 
 Entstanden nach der Idee einer sechsjährigen Spiele-Erfinderin.
